@@ -36,28 +36,37 @@ const MailIcon = (props) => (
   </svg>
 )
 
+// Bolt: Extract list to memoized component to prevent re-renders on parent updates
+const MediatorList = React.memo(({ items }) => {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {items.map((mediator) => (
+        <Card key={mediator.id}>
+          <CardHeader>
+            <CardTitle>{mediator.name}</CardTitle>
+            <CardDescription>{mediator.description}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button asChild variant="outline" size="sm" className="w-full sm:w-auto">
+              <a href={`mailto:${mediator.contact}`} aria-label={`Contact ${mediator.name}`}>
+                <MailIcon className="mr-2 h-4 w-4" />
+                Contact
+              </a>
+            </Button>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  );
+});
+
+MediatorList.displayName = 'MediatorList';
+
 const Mediators = () => {
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-4">Mediator Directory</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {mediators.map((mediator) => (
-          <Card key={mediator.id}>
-            <CardHeader>
-              <CardTitle>{mediator.name}</CardTitle>
-              <CardDescription>{mediator.description}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button asChild variant="outline" size="sm" className="w-full sm:w-auto">
-                <a href={`mailto:${mediator.contact}`} aria-label={`Contact ${mediator.name}`}>
-                  <MailIcon className="mr-2 h-4 w-4" />
-                  Contact
-                </a>
-              </Button>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      <MediatorList items={mediators} />
       <div className="mt-8">
         <h2 className="text-2xl font-bold mb-4">Find a Mediator Near You</h2>
         <div className="w-full h-96 bg-gray-100 dark:bg-gray-800 rounded-md border border-dashed border-gray-300 dark:border-gray-700 flex flex-col items-center justify-center text-center p-6">
