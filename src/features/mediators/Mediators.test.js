@@ -1,5 +1,6 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import Mediators from './MediatorsPage';
 
 describe('Mediators Component', () => {
@@ -31,5 +32,30 @@ describe('Mediators Component', () => {
 
     expect(contactLinks[1]).toHaveAttribute('href', 'mailto:jane.smith@example.com');
     expect(contactLinks[1]).toHaveAttribute('aria-label', 'Contact Jane Smith');
+  });
+
+  it('filters mediators based on search input', async () => {
+    render(<Mediators />);
+    const searchInput = screen.getByPlaceholderText('Search mediators...');
+
+    userEvent.type(searchInput, 'Jane');
+
+    await waitFor(() => {
+      expect(screen.getByText('Jane Smith')).toBeInTheDocument();
+      expect(screen.queryByText('John Doe')).not.toBeInTheDocument();
+    });
+  });
+
+  it('displays empty state when no mediators match', async () => {
+    render(<Mediators />);
+    const searchInput = screen.getByPlaceholderText('Search mediators...');
+
+    userEvent.type(searchInput, 'Zelda');
+
+    await waitFor(() => {
+      expect(screen.getByText('No mediators found')).toBeInTheDocument();
+      expect(screen.queryByText('John Doe')).not.toBeInTheDocument();
+      expect(screen.queryByText('Jane Smith')).not.toBeInTheDocument();
+    });
   });
 });
