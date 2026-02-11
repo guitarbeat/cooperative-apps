@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
 import { toast } from "sonner";
-import { useErrorHandler } from "./useErrorHandler";
 
 const initialState = {
     partyAName: "",
@@ -95,39 +94,38 @@ const getRequiredFieldsForSubStep = (step, subStep) => {
  * @returns {Object} Form data state and operations
  */
 export const useFormData = () => {
-    const { executeAsync } = useErrorHandler();
     const STORAGE_KEY = "mediation_form_v1";
 
     const [formData, setFormData] = useState(initialState);
     const [loadedFromStorage, setLoadedFromStorage] = useState(false);
 
-    const loadFromStorage = useCallback(async () => {
-        const { success, data } = await executeAsync(async () => {
+    const loadFromStorage = useCallback(() => {
+        try {
             const saved = localStorage.getItem(STORAGE_KEY);
             if (saved) {
-                return JSON.parse(saved);
+                const data = JSON.parse(saved);
+                setFormData({ ...initialState, ...data });
+                setLoadedFromStorage(true);
             }
-            return null;
-        }, { operation: "load" });
-
-        if (success && data) {
-            setFormData({ ...initialState, ...data });
-            setLoadedFromStorage(true);
+        } catch (e) {
+            console.error("Failed to load form data from storage:", e);
         }
-    }, [executeAsync]);
+    }, []);
 
     useEffect(() => {
         loadFromStorage();
     }, [loadFromStorage]);
 
-    const saveToStorage = useCallback(async (data) => {
-        await executeAsync(async () => {
+    const saveToStorage = useCallback((data) => {
+        try {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-        }, { operation: "save" });
-    }, [executeAsync]);
+        } catch (e) {
+            console.error("Failed to save form data to storage:", e);
+        }
+    }, []);
 
     useEffect(() => {
-        if (loadedFromStorage) { // Only save after initial load
+        if (loadedFromStorage) {
             saveToStorage(formData);
         }
     }, [formData, loadedFromStorage, saveToStorage]);
@@ -162,16 +160,16 @@ export const useFormData = () => {
      * Reset form data to initial state and clear saved storage
      */
     const resetFormData = useCallback(async () => {
+    const resetFormData = useCallback(() => {
         setFormData(initialState);
         setLoadedFromStorage(false);
-        const { success } = await executeAsync(async () => {
+        try {
             localStorage.removeItem(STORAGE_KEY);
-        }, { operation: "clear" });
-
-        if (success) {
             toast.success("Form data reset successfully");
+        } catch (e) {
+            console.error("Failed to clear storage:", e);
         }
-    }, [executeAsync]);
+    }, []);
 
     /**
      * Get form data for a specific step
