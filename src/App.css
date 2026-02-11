@@ -135,6 +135,18 @@
   padding-top: var(--space-8);
 }
 
+.party-field--no-stripe {
+  padding-left: var(--space-5);
+}
+
+.party-field--no-stripe::before {
+  display: none;
+}
+
+.party-field--no-stripe.party-field--compact {
+  padding-left: var(--space-4);
+}
+
 .party-field--with-badge::after {
   content: attr(data-party-label);
   position: absolute;
@@ -151,6 +163,35 @@
   background: var(--primary);
   color: var(--primary-foreground);
   box-shadow: var(--shadow-sm);
+}
+
+.party-setup-card {
+  border-color: color-mix(in srgb, var(--party-setup-border, var(--border)) 70%, transparent);
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--party-setup-surface, transparent) 70%, transparent),
+    color-mix(in srgb, var(--background) 90%, transparent)
+  );
+}
+
+.party-setup-card__header {
+  border-bottom: 1px solid color-mix(in srgb, var(--party-setup-border, var(--border)) 45%, transparent);
+  padding-bottom: var(--space-2);
+}
+
+.party-setup-card__title {
+  color: color-mix(in srgb, var(--foreground) 70%, var(--party-setup-accent, var(--foreground)));
+  letter-spacing: var(--letter-spacing-wide);
+}
+
+.party-setup-card__badge {
+  border-color: color-mix(in srgb, var(--party-setup-border, var(--border)) 65%, transparent);
+  background: color-mix(in srgb, var(--party-setup-surface, transparent) 70%, transparent);
+  color: color-mix(in srgb, var(--foreground) 75%, var(--party-setup-accent, var(--foreground)));
+}
+
+.party-setup-card__badge-dot {
+  border-color: color-mix(in srgb, var(--party-setup-accent, var(--border)) 70%, var(--border));
 }
 
 .party-color-input {

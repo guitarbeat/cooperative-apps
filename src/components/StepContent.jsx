@@ -527,6 +527,7 @@ const StepContent = ({ step, formData, updateFormData, updateMultipleFields, onE
       labelClassName = "",
       containerProps: extraContainerProps = {},
       showBadge,
+      showStripe = true,
     } = {},
   ) => {
     const details = partyDetails[party];
@@ -541,6 +542,9 @@ const StepContent = ({ step, formData, updateFormData, updateMultipleFields, onE
     }
     if (shouldShowBadge) {
       baseClasses.push("party-field--with-badge");
+    }
+    if (!showStripe) {
+      baseClasses.push("party-field--no-stripe");
     }
 
     const combinedClassName = [
@@ -710,8 +714,8 @@ const StepContent = ({ step, formData, updateFormData, updateMultipleFields, onE
           normalizedColor: normalizedPartyAColor,
           nameValue: partyANameValue,
           fallbackName: "Party A",
-          colorFieldProps: getPartyFieldProps("A", { variant: "simple", showBadge: false }),
-          nameFieldProps: getPartyFieldProps("A"),
+          colorFieldProps: getPartyFieldProps("A", { variant: "simple", showBadge: false, showStripe: false }),
+          nameFieldProps: getPartyFieldProps("A", { showBadge: false, showStripe: false }),
           error: step1Errors.partyAName?.message,
         },
         {
@@ -720,8 +724,8 @@ const StepContent = ({ step, formData, updateFormData, updateMultipleFields, onE
           normalizedColor: normalizedPartyBColor,
           nameValue: partyBNameValue,
           fallbackName: "Party B",
-          colorFieldProps: getPartyFieldProps("B", { variant: "simple", showBadge: false }),
-          nameFieldProps: getPartyFieldProps("B"),
+          colorFieldProps: getPartyFieldProps("B", { variant: "simple", showBadge: false, showStripe: false }),
+          nameFieldProps: getPartyFieldProps("B", { showBadge: false, showStripe: false }),
           error: step1Errors.partyBName?.message,
         },
       ];
@@ -750,19 +754,22 @@ const StepContent = ({ step, formData, updateFormData, updateMultipleFields, onE
                 <section
                   key={key}
                   className={cn(
-                    "space-y-4 rounded-xl border bg-background/60 p-4 shadow-sm transition",
+                    "party-setup-card space-y-4 rounded-xl border bg-background/60 p-4 shadow-sm transition",
                     "hover:shadow-md focus-within:ring-2 focus-within:ring-primary/40"
                   )}
+                  style={{
+                    "--party-setup-accent": normalizedColor,
+                    "--party-setup-surface": toRgba(normalizedColor, 0.08),
+                    "--party-setup-border": toRgba(normalizedColor, 0.35),
+                  }}
                 >
-                  <header className="space-y-1">
+                  <header className="party-setup-card__header space-y-1">
                     <div className="flex items-center justify-between gap-2">
-                      <h3 className="text-sm font-semibold tracking-wide text-muted-foreground uppercase">
+                      <h3 className="party-setup-card__title text-sm font-semibold tracking-wide text-muted-foreground uppercase">
                         {fallbackName}
                       </h3>
-                      <span
-                        className="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-medium"
-                      >
-                        <span className="inline-block h-2.5 w-2.5 rounded-full border" style={{ backgroundColor: normalizedColor }} />
+                      <span className="party-setup-card__badge inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-medium">
+                        <span className="party-setup-card__badge-dot inline-block h-2.5 w-2.5 rounded-full border" style={{ backgroundColor: normalizedColor }} />
                         {displayName}
                       </span>
                     </div>

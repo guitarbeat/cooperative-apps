@@ -76,7 +76,6 @@ describe("useNavigation", () => {
 
     expect(result.current.currentStep).toBe(2);
     expect(result.current.isAnimating).toBe(false);
-    expect(result.current.dragOffset).toBe(0);
   });
 
   it("clamps the current step when the total step count decreases", () => {

@@ -162,4 +162,4 @@ const NavigationButtons = ({
   );
 };
 
-export default NavigationButtons;
+export default React.memo(NavigationButtons);
