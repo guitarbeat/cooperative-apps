@@ -212,4 +212,3 @@ const arePropsEqual = (prevProps, nextProps) => {
 };
 
 export default React.memo(CategoryNavigation, arePropsEqual);
-export default React.memo(CategoryNavigation);
