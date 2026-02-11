@@ -302,6 +302,7 @@ export const RatingInput = ({
               onMouseLeave={handleMouseLeave}
               className="p-1 hover:scale-110 transition-transform"
               aria-label={`Rate ${rating} out of ${max}`}
+              aria-pressed={rating === value}
               aria-pressed={value === rating}
             >
               {getIcon(type, isFilled)}
@@ -511,6 +512,7 @@ export const StructuredListInput = ({
                     type="button"
                     onClick={handleSaveEdit}
                     className="px-2 py-1 bg-green-500 text-white rounded text-sm"
+                    aria-label="Save changes"
                     aria-label="Save item"
                   >
                     <Check className="h-3 w-3" />
