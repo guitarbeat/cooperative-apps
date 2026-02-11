@@ -186,4 +186,30 @@ const CategoryNavigation = ({
   );
 };
 
-export default CategoryNavigation;
+const arePropsEqual = (prevProps, nextProps) => {
+  if (prevProps.currentStep !== nextProps.currentStep) return false;
+  // If the navigation handler changes, we must re-render.
+  // Note: In App.jsx, we've optimized this to be stable via useCallback,
+  // but we check it here for correctness.
+  if (prevProps.onNavigateToStep !== nextProps.onNavigateToStep) return false;
+
+  // Check if progress has changed for any category.
+  // We avoid re-rendering if formData changes but the completion status
+  // of steps remains the same (e.g., typing in an already valid field).
+  const categories = Object.values(SURVEY_CATEGORIES);
+  for (const category of categories) {
+    const prevProgress = getCategoryProgress(prevProps.formData, category);
+    const nextProgress = getCategoryProgress(nextProps.formData, category);
+
+    // We only care if completed count changes
+    // (total and optional are static configuration)
+    if (prevProgress.completed !== nextProgress.completed) {
+      return false;
+    }
+  }
+
+  return true;
+};
+
+export default React.memo(CategoryNavigation, arePropsEqual);
+export default React.memo(CategoryNavigation);

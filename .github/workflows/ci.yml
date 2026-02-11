@@ -12,6 +12,26 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # Setup pnpm first so it is available for setup-node caching
+      - name: Setup pnpm
+        id: setup-pnpm
+        uses: pnpm/action-setup@v4.1.0
+        with:
+          version: 10.4.1
+        continue-on-error: true
+
+      - name: Install pnpm manually (fallback)
+        if: steps.setup-pnpm.outcome == 'failure'
+        run: |
+          echo "pnpm/action-setup failed, installing pnpm manually..."
+          # Assuming system node/npm is available or we might need to rely on setup-node running later?
+          # Actually, if we need npm here, we might be using the pre-installed one on the runner.
+          npm install -g pnpm@10.4.1
+          echo "pnpm installed successfully"
+          echo "Verifying pnpm installation..."
+          ls -la $(which pnpm) || echo "pnpm binary not found"
+          chmod +x $(which pnpm) || echo "Could not make pnpm executable"
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -26,23 +46,6 @@ jobs:
           echo "Current directory: $(pwd)"
           echo "Available commands:"
           which node npm || echo "Node/npm not found in PATH"
-
-      - name: Setup pnpm
-        id: setup-pnpm
-        uses: pnpm/action-setup@v4.1.0
-        with:
-          version: 10.4.1
-        continue-on-error: true
-
-      - name: Install pnpm manually (fallback)
-        if: steps.setup-pnpm.outcome == 'failure'
-        run: |
-          echo "pnpm/action-setup failed, installing pnpm manually..."
-          npm install -g pnpm@10.4.1
-          echo "pnpm installed successfully"
-          echo "Verifying pnpm installation..."
-          ls -la $(which pnpm) || echo "pnpm binary not found"
-          chmod +x $(which pnpm) || echo "Could not make pnpm executable"
 
       - name: Check pnpm version
         run: |

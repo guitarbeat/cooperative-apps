@@ -1,85 +1,71 @@
 import React, { useEffect, useRef } from "react";
 import StepCard from "./StepCard";
+import { useCardSwipe } from "../hooks/useCardSwipe";
 
 const CardStack = ({
   totalSteps,
   currentStep,
-  dragOffset,
   animatingCard,
   animationType,
+  stepElements,
+  onNavigate,
   isDragging,
   onInputStart,
   onInputMove,
   onInputEnd,
   onMouseLeave,
-  stepElements,
+  renderStepContent,
 }) => {
   const cardRefs = useRef({});
+
+  const { dragOffset, handlers } = useCardSwipe({
+    onSwipeLeft: () => onNavigate && onNavigate("next"),
+    onSwipeRight: () => onNavigate && onNavigate("prev"),
+    disabled: animatingCard !== null,
+  });
+
+  const {
+    handleInputStart,
+    handleInputMove,
+    handleInputEnd,
+    handleMouseLeave,
+  } = handlers;
 
   // Add event listeners with proper passive options
   useEffect(() => {
     const currentCard = cardRefs.current[currentStep];
     if (!currentCard) return;
 
-    const handleTouchStart = (e) => {
-      if (onInputStart) onInputStart(e);
-    };
-
-    const handleTouchMove = (e) => {
-      if (onInputMove) onInputMove(e);
-    };
-
-    const handleTouchEnd = (e) => {
-      if (onInputEnd) onInputEnd(e);
-    };
-
-    const handleMouseDown = (e) => {
-      if (onInputStart) onInputStart(e);
-    };
-
-    const handleMouseMove = (e) => {
-      if (isDragging && onInputMove) onInputMove(e);
-    };
-
-    const handleMouseUp = (e) => {
-      if (isDragging && onInputEnd) onInputEnd(e);
-    };
-
-    const handleMouseLeave = (e) => {
-      if (onMouseLeave) onMouseLeave(e);
-    };
-
     // Add event listeners with passive: false for touch events
-    currentCard.addEventListener("touchstart", handleTouchStart, {
+    currentCard.addEventListener("touchstart", handleInputStart, {
       passive: false,
     });
-    currentCard.addEventListener("touchmove", handleTouchMove, {
+    currentCard.addEventListener("touchmove", handleInputMove, {
       passive: false,
     });
-    currentCard.addEventListener("touchend", handleTouchEnd, {
+    currentCard.addEventListener("touchend", handleInputEnd, {
       passive: false,
     });
-    currentCard.addEventListener("mousedown", handleMouseDown);
-    currentCard.addEventListener("mousemove", handleMouseMove);
-    currentCard.addEventListener("mouseup", handleMouseUp);
+    currentCard.addEventListener("mousedown", handleInputStart);
+    currentCard.addEventListener("mousemove", handleInputMove);
+    currentCard.addEventListener("mouseup", handleInputEnd);
     currentCard.addEventListener("mouseleave", handleMouseLeave);
 
     return () => {
-      currentCard.removeEventListener("touchstart", handleTouchStart);
-      currentCard.removeEventListener("touchmove", handleTouchMove);
-      currentCard.removeEventListener("touchend", handleTouchEnd);
-      currentCard.removeEventListener("mousedown", handleMouseDown);
-      currentCard.removeEventListener("mousemove", handleMouseMove);
-      currentCard.removeEventListener("mouseup", handleMouseUp);
+      currentCard.removeEventListener("touchstart", handleInputStart);
+      currentCard.removeEventListener("touchmove", handleInputMove);
+      currentCard.removeEventListener("touchend", handleInputEnd);
+      currentCard.removeEventListener("mousedown", handleInputStart);
+      currentCard.removeEventListener("mousemove", handleInputMove);
+      currentCard.removeEventListener("mouseup", handleInputEnd);
       currentCard.removeEventListener("mouseleave", handleMouseLeave);
     };
   }, [
     currentStep,
-    isDragging,
-    onInputStart,
-    onInputMove,
-    onInputEnd,
-    onMouseLeave,
+    handleInputStart,
+    handleInputMove,
+    handleInputEnd,
+    handleMouseLeave,
   ]);
   const renderCardStack = () => {
     return Array.from({ length: totalSteps }, (_, index) => {
@@ -170,7 +156,7 @@ const CardStack = ({
           style={cardStyle}
           data-testid={isActive ? "current-card" : ""}
         >
-          <StepCard>{stepElements[index]}</StepCard>
+          <StepCard>{renderStepContent(stepNumber)}</StepCard>
         </div>
       );
     });

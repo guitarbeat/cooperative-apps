@@ -16,7 +16,6 @@ import { toast } from "sonner";
 import { getCategoryByStep } from "../config/surveyCategories";
 import { useErrorHandler } from "../hooks/useErrorHandler";
 import { PDFLoadingState, FileLoadingState } from "./LoadingState";
-import { GLOBAL_DEPENDENCIES, STEP_DEPENDENCIES } from "../utils/stepDependencies";
 
 const DEFAULT_PARTY_COLORS = {
   A: "#6B8E47",
@@ -528,6 +527,7 @@ const StepContent = ({ step, formData, updateFormData, updateMultipleFields, onE
       labelClassName = "",
       containerProps: extraContainerProps = {},
       showBadge,
+      showStripe = true,
     } = {},
   ) => {
     const details = partyDetails[party];
@@ -542,6 +542,9 @@ const StepContent = ({ step, formData, updateFormData, updateMultipleFields, onE
     }
     if (shouldShowBadge) {
       baseClasses.push("party-field--with-badge");
+    }
+    if (!showStripe) {
+      baseClasses.push("party-field--no-stripe");
     }
 
     const combinedClassName = [
@@ -711,8 +714,8 @@ const StepContent = ({ step, formData, updateFormData, updateMultipleFields, onE
           normalizedColor: normalizedPartyAColor,
           nameValue: partyANameValue,
           fallbackName: "Party A",
-          colorFieldProps: getPartyFieldProps("A", { variant: "simple", showBadge: false }),
-          nameFieldProps: getPartyFieldProps("A"),
+          colorFieldProps: getPartyFieldProps("A", { variant: "simple", showBadge: false, showStripe: false }),
+          nameFieldProps: getPartyFieldProps("A", { showBadge: false, showStripe: false }),
           error: step1Errors.partyAName?.message,
         },
         {
@@ -721,8 +724,8 @@ const StepContent = ({ step, formData, updateFormData, updateMultipleFields, onE
           normalizedColor: normalizedPartyBColor,
           nameValue: partyBNameValue,
           fallbackName: "Party B",
-          colorFieldProps: getPartyFieldProps("B", { variant: "simple", showBadge: false }),
-          nameFieldProps: getPartyFieldProps("B"),
+          colorFieldProps: getPartyFieldProps("B", { variant: "simple", showBadge: false, showStripe: false }),
+          nameFieldProps: getPartyFieldProps("B", { showBadge: false, showStripe: false }),
           error: step1Errors.partyBName?.message,
         },
       ];
@@ -751,19 +754,22 @@ const StepContent = ({ step, formData, updateFormData, updateMultipleFields, onE
                 <section
                   key={key}
                   className={cn(
-                    "space-y-4 rounded-xl border bg-background/60 p-4 shadow-sm transition",
+                    "party-setup-card space-y-4 rounded-xl border bg-background/60 p-4 shadow-sm transition",
                     "hover:shadow-md focus-within:ring-2 focus-within:ring-primary/40"
                   )}
+                  style={{
+                    "--party-setup-accent": normalizedColor,
+                    "--party-setup-surface": toRgba(normalizedColor, 0.08),
+                    "--party-setup-border": toRgba(normalizedColor, 0.35),
+                  }}
                 >
-                  <header className="space-y-1">
+                  <header className="party-setup-card__header space-y-1">
                     <div className="flex items-center justify-between gap-2">
-                      <h3 className="text-sm font-semibold tracking-wide text-muted-foreground uppercase">
+                      <h3 className="party-setup-card__title text-sm font-semibold tracking-wide text-muted-foreground uppercase">
                         {fallbackName}
                       </h3>
-                      <span
-                        className="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-medium"
-                      >
-                        <span className="inline-block h-2.5 w-2.5 rounded-full border" style={{ backgroundColor: normalizedColor }} />
+                      <span className="party-setup-card__badge inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-medium">
+                        <span className="party-setup-card__badge-dot inline-block h-2.5 w-2.5 rounded-full border" style={{ backgroundColor: normalizedColor }} />
                         {displayName}
                       </span>
                     </div>
@@ -1554,38 +1560,4 @@ const StepContent = ({ step, formData, updateFormData, updateMultipleFields, onE
   }
 };
 
-const arePropsEqual = (prevProps, nextProps) => {
-  if (prevProps.step !== nextProps.step) return false;
-  if (prevProps.showErrors !== nextProps.showErrors) return false;
-  if (prevProps.currentSubStep !== nextProps.currentSubStep) return false;
-  // If update functions change, we must re-render (though they should be stable)
-  if (prevProps.updateFormData !== nextProps.updateFormData) return false;
-  if (prevProps.updateMultipleFields !== nextProps.updateMultipleFields) return false;
-
-  // Step 7 (Export) depends on everything for PDF generation/export
-  if (prevProps.step === 7) {
-    // If formData reference changed, we must update Step 7 so it has the latest data for export.
-    // Since App.jsx passes a new formData object on every change, this effectively means
-    // Step 7 re-renders on every change, which is correct/safe behavior for the export step.
-    return prevProps.formData === nextProps.formData;
-  }
-
-  // Check global dependencies (e.g. party names, colors)
-  for (const field of GLOBAL_DEPENDENCIES) {
-    if (prevProps.formData[field] !== nextProps.formData[field]) {
-      return false;
-    }
-  }
-
-  // Check step-specific dependencies
-  const stepFields = STEP_DEPENDENCIES[prevProps.step] || [];
-  for (const field of stepFields) {
-    if (prevProps.formData[field] !== nextProps.formData[field]) {
-      return false;
-    }
-  }
-
-  return true;
-};
-
-export default React.memo(StepContent, arePropsEqual);
+export default React.memo(StepContent);

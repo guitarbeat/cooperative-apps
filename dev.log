@@ -1,0 +1,12 @@
+
+> conflict-mediation-platform@0.0.0 dev /app
+> vite
+
+
+  VITE v6.3.5  ready in 809 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: http://192.168.0.2:5173/
+6:17:49 PM [vite] (client) hmr update /src/App.jsx, /src/App.css
+6:18:37 PM [vite] (client) page reload .Jules/palette.md
+6:18:48 PM [vite] (client) page reload verification/verify_multiselect.py

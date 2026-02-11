@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState, useRef } from "react";
 import DarkModeToggle from "./components/DarkModeToggle";
 import CategoryNavigation from "./components/CategoryNavigation";
 import NavigationButtons from "./components/NavigationButtons";
@@ -88,22 +88,29 @@ function App() {
     [getMissingFieldsForStep, isStepComplete, currentSubStep],
   );
 
+  // Create a ref to store the latest navigation guard function
+  // This allows us to pass a stable function reference to useNavigation
+  const navigationGuardRef = useRef(navigationGuard);
+
+  useEffect(() => {
+    navigationGuardRef.current = navigationGuard;
+  }, [navigationGuard]);
+
+  // Stable callback that delegates to the current guard implementation
+  const stableNavigationGuard = useCallback((...args) => {
+    return navigationGuardRef.current(...args);
+  }, []);
+
   // Navigation management
   const {
     currentStep,
-    dragOffset,
     animatingCard,
     animationType,
-    isDragging,
     isAnimating,
     totalSteps,
     navigateToStep,
-    handleInputStart,
-    handleInputMove,
-    handleInputEnd,
-    handleMouseLeave,
   } = useNavigation({
-    canNavigateToStep: navigationGuard,
+    canNavigateToStep: stableNavigationGuard,
     totalSteps: TOTAL_SURVEY_STEPS,
   });
 
@@ -135,7 +142,7 @@ function App() {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [isAnimating, navigateToStep]);
 
-  const handleNavigate = (direction) => {
+  const handleNavigate = useCallback((direction) => {
     const subStepCount = getSubStepCountForStep(currentStep);
 
     if (direction === 'next') {
@@ -157,7 +164,7 @@ function App() {
     } else {
       navigateToStep(direction);
     }
-  };
+  }, [currentStep, currentSubStep, navigateToStep]);
 
   // Export functions
   const exportToJSON = useCallback(() => {
@@ -173,24 +180,20 @@ function App() {
     linkElement.click();
   }, [formData]);
 
-  const stepElements = useMemo(() => {
-    return Array.from({ length: TOTAL_SURVEY_STEPS }, (_, index) => {
-      const step = index + 1;
-      return (
-        <StepContent
-          key={step}
-          step={step}
-          formData={formData}
-          updateFormData={updateFormData}
-          updateMultipleFields={updateMultipleFields}
-          onExportJSON={exportToJSON}
-          showErrors={errorStep === step}
-          getRequiredFieldsForStep={getRequiredFieldsForStep}
-          currentSubStep={currentSubStep}
-          setCurrentSubStep={setCurrentSubStep}
-        />
-      );
-    });
+  const renderStepContent = useCallback((step) => {
+    return (
+      <StepContent
+        step={step}
+        formData={formData}
+        updateFormData={updateFormData}
+        updateMultipleFields={updateMultipleFields}
+        onExportJSON={exportToJSON}
+        showErrors={errorStep === step}
+        getRequiredFieldsForStep={getRequiredFieldsForStep}
+        currentSubStep={currentSubStep}
+        setCurrentSubStep={setCurrentSubStep}
+      />
+    );
   }, [
     formData,
     updateFormData,
@@ -198,9 +201,9 @@ function App() {
     exportToJSON,
     errorStep,
     getRequiredFieldsForStep,
-    currentSubStep,
-    setCurrentSubStep,
+    currentSubStep
   ]);
+  }, [formData, updateFormData, updateMultipleFields, exportToJSON, errorStep, getRequiredFieldsForStep, currentSubStep]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -242,9 +245,7 @@ function App() {
         <CategoryNavigation
           formData={formData}
           currentStep={currentStep}
-          onNavigateToStep={(step) => {
-            navigateToStep(step);
-          }}
+          onNavigateToStep={navigateToStep}
         />
 
 
@@ -252,15 +253,16 @@ function App() {
         <CardStack
           totalSteps={totalSteps}
           currentStep={currentStep}
-          dragOffset={dragOffset}
           animatingCard={animatingCard}
           animationType={animationType}
+          stepElements={stepElements}
+          onNavigate={handleNavigate}
           isDragging={isDragging}
           onInputStart={handleInputStart}
           onInputMove={handleInputMove}
           onInputEnd={handleInputEnd}
           onMouseLeave={handleMouseLeave}
-          stepElements={stepElements}
+          renderStepContent={renderStepContent}
         />
 
         {/* Navigation Buttons */}
