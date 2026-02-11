@@ -3,19 +3,23 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import { componentTagger } from "lovable-tagger"
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
-// https://vite.dev/config/
-export default defineConfig({
-  plugins: [react(), tailwindcss()],
+export default defineConfig(({ mode }) => ({
+  plugins: [
+    react(),
+    tailwindcss(),
+    mode === 'development' && componentTagger(),
+  ].filter(Boolean),
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
   },
   server: {
-    host: '0.0.0.0',
+    host: '::',
     port: 8080,
   },
   test: {
@@ -23,4 +27,4 @@ export default defineConfig({
     setupFiles: './src/test/setupTests.js',
     css: true
   }
-})
+}))
