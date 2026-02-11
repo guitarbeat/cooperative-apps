@@ -255,13 +255,7 @@ function App() {
           currentStep={currentStep}
           animatingCard={animatingCard}
           animationType={animationType}
-          stepElements={stepElements}
           onNavigate={handleNavigate}
-          isDragging={isDragging}
-          onInputStart={handleInputStart}
-          onInputMove={handleInputMove}
-          onInputEnd={handleInputEnd}
-          onMouseLeave={handleMouseLeave}
           renderStepContent={renderStepContent}
         />
 
