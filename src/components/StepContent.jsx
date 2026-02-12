@@ -14,7 +14,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { getCategoryByStep } from "../config/surveyCategories";
-import { useErrorHandler } from "../hooks/useErrorHandler";
+
 import { PDFLoadingState, FileLoadingState } from "./LoadingState";
 
 const DEFAULT_PARTY_COLORS = {
@@ -482,11 +482,28 @@ const Step1Schema = z.object({
 });
 
 const StepContent = ({ step, formData, updateFormData, updateMultipleFields, onExportJSON, showErrors, getRequiredFieldsForStep, currentSubStep }) => {
-  // Error handling
-  const { executeFileOperation, executeAsync } = useErrorHandler({
-    showToast: true,
-    logErrors: true
-  });
+  // Inline error wrappers (avoid useErrorHandler to prevent React dual-instance issues)
+  const executeFileOperation = React.useCallback(async (fn, context = {}) => {
+    try {
+      const data = await fn();
+      return { success: true, data, error: null };
+    } catch (error) {
+      console.error("File operation failed:", error, context);
+      toast.error(error.message || "File operation failed");
+      return { success: false, data: null, error: { message: error.message } };
+    }
+  }, []);
+
+  const executeAsync = React.useCallback(async (fn, context = {}) => {
+    try {
+      const data = await fn();
+      return { success: true, data, error: null };
+    } catch (error) {
+      console.error("Operation failed:", error, context);
+      toast.error(error.message || "Operation failed");
+      return { success: false, data: null, error: { message: error.message } };
+    }
+  }, []);
 
   // Loading states
   const [isGeneratingPDF, setIsGeneratingPDF] = React.useState(false);
