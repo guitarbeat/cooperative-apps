@@ -14,6 +14,6 @@
 **Learning:** Users typing in search fields expect a quick way to clear the input without backspacing. A 'Clear' button that appears dynamically and refocuses the input is a standard pattern that significantly reduces friction.
 **Action:** Enhance all search inputs with a wrapper containing a search icon (for affordance) and a conditional clear button that resets state and focus.
 
-## 2026-01-23 - [Consistent Button Loading States]
-**Learning:** Manually implementing loading spinners in buttons leads to inconsistent UI and code duplication. Integrating a `loading` prop directly into the shared `Button` component ensures uniform feedback (spinner + disabled state) and simplifies consumption. Note: Radix UI `Slot` (used for `asChild`) requires careful handling of children when injecting elements like spinners.
-**Action:** Use the enhanced `Button` component with `loading={isSubmitting}` for all async actions instead of manual spinner implementation.
+## 2026-02-17 - [Standardized Async Feedback]
+**Learning:** Reusable components like `<Button>` often lack built-in loading states, leading to inconsistent manual implementations across features. Centralizing this logic into the component ensures consistency (disabled state + spinner) and reduces boilerplate in feature code.
+**Action:** Enhance core UI components to handle common async states (`isLoading`) internally rather than relying on parent components to manage visual feedback manually.
