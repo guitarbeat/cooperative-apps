@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../../shared/ui/card';
 import { Button } from '../../shared/ui/button';
+import { SearchInput } from '../../shared/ui/search-input';
 
 // Bolt: Move static data outside component to prevent reallocation on every render
 const mediators = [
@@ -38,6 +39,15 @@ const MailIcon = (props) => (
 
 // Bolt: Extract list to memoized component to prevent re-renders on parent updates
 const MediatorList = React.memo(({ items }) => {
+  if (items.length === 0) {
+    return (
+      <div className="text-center py-12" role="status">
+        <p className="text-lg font-medium text-muted-foreground">No mediators found</p>
+        <p className="text-sm text-muted-foreground mt-1">Try adjusting your search terms</p>
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {items.map((mediator) => (
@@ -63,10 +73,24 @@ const MediatorList = React.memo(({ items }) => {
 MediatorList.displayName = 'MediatorList';
 
 const Mediators = () => {
+  const [filter, setFilter] = useState('');
+
+  const filteredMediators = useMemo(() => {
+    return mediators.filter(mediator =>
+      mediator.name.toLowerCase().includes(filter.toLowerCase()) ||
+      mediator.description.toLowerCase().includes(filter.toLowerCase())
+    );
+  }, [filter]);
+
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-4">Mediator Directory</h1>
-      <MediatorList items={mediators} />
+      <SearchInput
+        onSearch={setFilter}
+        placeholder="Search mediators..."
+        aria-label="Search mediators"
+      />
+      <MediatorList items={filteredMediators} />
       <div className="mt-8">
         <h2 className="text-2xl font-bold mb-4">Find a Mediator Near You</h2>
         <div className="w-full h-96 bg-gray-100 dark:bg-gray-800 rounded-md border border-dashed border-gray-300 dark:border-gray-700 flex flex-col items-center justify-center text-center p-6">
