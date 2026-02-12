@@ -159,7 +159,6 @@ export const useFormData = () => {
     /**
      * Reset form data to initial state and clear saved storage
      */
-    const resetFormData = useCallback(async () => {
     const resetFormData = useCallback(() => {
         setFormData(initialState);
         setLoadedFromStorage(false);
