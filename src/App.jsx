@@ -215,6 +215,10 @@ function App() {
           <img
             src={logo}
             alt="Co-op logo"
+            width={48}
+            height={48}
+            loading="eager"
+            decoding="async"
             className="h-12 w-12 rounded-lg border border-border bg-background object-contain shadow-sm"
           />
           <div className="flex-1">
