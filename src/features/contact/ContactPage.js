@@ -102,13 +102,8 @@ const ContactForm = () => {
         />
       </div>
 
-      <Button type="submit" disabled={isSubmitting} className="w-full sm:w-auto">
-        {isSubmitting ? (
-          <>
-            <span className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" aria-hidden="true" />
-            Sending...
-          </>
-        ) : 'Send Message'}
+      <Button type="submit" loading={isSubmitting} className="w-full sm:w-auto">
+        {isSubmitting ? 'Sending...' : 'Send Message'}
       </Button>
 
       {submitStatus === 'error' && (
