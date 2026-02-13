@@ -32,6 +32,8 @@ const GuidanceAlert = ({
   step,
   partyAName = "Party A",
   partyBName = "Party B",
+  partyAEmoji = "",
+  partyBEmoji = "",
 }) => {
   const getGuidanceInfo = (step) => {
     switch (step) {
@@ -51,7 +53,7 @@ const GuidanceAlert = ({
         return {
           icon: User,
           title: "Individual Reflection",
-          message: `${
+          message: `${partyAEmoji ? `${partyAEmoji} ` : ""}${
             partyAName ? `${partyAName}, please` : "Please"
           } complete this section individually. ${
             partyBName || "The other party"
@@ -67,7 +69,7 @@ const GuidanceAlert = ({
         return {
           icon: User,
           title: "Individual Reflection",
-          message: `${
+          message: `${partyBEmoji ? `${partyBEmoji} ` : ""}${
             partyBName ? `${partyBName}, please` : "Please"
           } complete this section individually. ${
             partyAName || "The other party"
