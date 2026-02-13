@@ -10,10 +10,10 @@ describe('Button', () => {
     expect(screen.getByRole('button', { name: /click me/i })).toBeInTheDocument();
   });
 
-  test('renders loading spinner when loading is true', () => {
+  test('renders loading spinner when isLoading is true', () => {
     // Note: The spinner is an icon inside the button, so checking for its class or role is tricky without a specific test id or role on the spinner itself.
     // However, the button should be disabled.
-    render(<Button loading>Loading...</Button>);
+    render(<Button isLoading>Loading...</Button>);
 
     const button = screen.getByRole('button', { name: /loading.../i });
     expect(button).toBeDisabled();

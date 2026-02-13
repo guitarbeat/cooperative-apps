@@ -33,22 +33,25 @@ const buttonVariants = cva(
   }
 )
 
-const Button = React.forwardRef(({ className, variant, size, asChild = false, loading = false, children, disabled, ...props }, ref) => {
+const Button = React.forwardRef(({ className, variant, size, asChild = false, isLoading = false, children, disabled, ...props }, ref) => {
   const Comp = asChild ? Slot : "button"
   return (
     <Comp
       className={cn(buttonVariants({ variant, size, className }))}
+      disabled={isLoading || disabled}
       ref={ref}
-      disabled={loading || disabled}
       {...props}
     >
-      {asChild ? children : (
+      {isLoading && !asChild ? (
         <>
-          {loading && (
-            <span className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" aria-hidden="true" />
-          )}
+          <span
+            className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"
+            aria-hidden="true"
+          />
           {children}
         </>
+      ) : (
+        children
       )}
     </Comp>
   );

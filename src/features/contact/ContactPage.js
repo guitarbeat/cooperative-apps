@@ -102,7 +102,7 @@ const ContactForm = () => {
         />
       </div>
 
-      <Button type="submit" loading={isSubmitting} className="w-full sm:w-auto">
+      <Button type="submit" isLoading={isSubmitting} className="w-full sm:w-auto">
         {isSubmitting ? 'Sending...' : 'Send Message'}
       </Button>
 
