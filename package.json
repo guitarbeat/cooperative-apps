@@ -1,0 +1,14 @@
+{
+  "name": "cooperative-apps",
+  "private": true,
+  "description": "Cooperative community tools: House Love platform and Conflict Mediation Platform",
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "houselove:start": "pnpm --filter house-love start",
+    "houselove:build": "pnpm --filter house-love build",
+    "conflict:dev": "pnpm --filter conflict-mediation-platform dev",
+    "conflict:build": "pnpm --filter conflict-mediation-platform build"
+  }
+}
