@@ -1,5 +1,7 @@
 import React, { Suspense, useEffect } from "react";
-import { Download, FileText, Upload, Loader2, RefreshCcw, ArrowLeftRight, Sparkles } from "lucide-react";
+import { Download, FileText, Upload, Loader2, RefreshCcw, ArrowLeftRight, Handshake } from "lucide-react";
+import { motion } from "framer-motion";
+import PartySetupCard from "./PartySetupCard";
 import { Button } from "./ui/button";
 import FormField from "./FormField";
 import EnhancedFormField from "./EnhancedFormField";
@@ -724,189 +726,103 @@ const StepContent = ({ step, formData, updateFormData, updateMultipleFields, onE
         updateFormData(fieldName, value);
       };
 
-      const partyCards = [
-        {
-          key: "A",
-          colorValue: partyAColorValue,
-          normalizedColor: normalizedPartyAColor,
-          nameValue: partyANameValue,
-          fallbackName: "Party A",
-          colorFieldProps: getPartyFieldProps("A", { variant: "simple", showBadge: false, showStripe: false }),
-          nameFieldProps: getPartyFieldProps("A", { showBadge: false, showStripe: false }),
-          error: step1Errors.partyAName?.message,
-        },
-        {
-          key: "B",
-          colorValue: partyBColorValue,
-          normalizedColor: normalizedPartyBColor,
-          nameValue: partyBNameValue,
-          fallbackName: "Party B",
-          colorFieldProps: getPartyFieldProps("B", { variant: "simple", showBadge: false, showStripe: false }),
-          nameFieldProps: getPartyFieldProps("B", { showBadge: false, showStripe: false }),
-          error: step1Errors.partyBName?.message,
-        },
-      ];
+      const handlePartyEmojiChange = (partyKey, value) => {
+        const fieldName = partyKey === "A" ? "partyAEmoji" : "partyBEmoji";
+        updateFormData(fieldName, value);
+      };
 
       return (
         <div className="space-y-3 sm:space-y-4">
           <CategoryHeader step={step} />
           <SectionSeparator title="Personalize each party" />
-          <div className="rounded-lg border bg-card/40 p-3 sm:p-4 flex items-start gap-3">
-            <Sparkles className="h-5 w-5 text-primary shrink-0 mt-0.5" aria-hidden="true" />
-            <div className="space-y-2">
-              <p className="text-sm sm:text-base text-muted-foreground">
-                Start with the accent colors so every insight in later steps is easy to scan at a glance.
-                Then add each person's name to tailor the coaching language automatically.
+
+          {/* Friendly onboarding micro-copy */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="rounded-lg border bg-card/40 p-3 sm:p-4 flex items-start gap-3"
+          >
+            <Handshake className="h-5 w-5 text-primary shrink-0 mt-0.5" aria-hidden="true" />
+            <div className="space-y-1">
+              <p className="text-sm sm:text-base text-foreground font-medium">
+                👋 Let's get to know both sides!
               </p>
               <p className="text-xs sm:text-sm text-muted-foreground">
-                You can choose from the quick picks below or fine-tune the color picker for a custom shade.
+                Pick an emoji avatar, choose a color, and add each person's name. These will follow you through the whole mediation journey.
               </p>
             </div>
-          </div>
+          </motion.div>
 
-          <div className="grid gap-4 md:grid-cols-2">
-            {partyCards.map(({ key, colorValue, normalizedColor, nameValue, fallbackName, colorFieldProps, nameFieldProps, error }) => {
-              const displayName = nameValue || fallbackName;
-              return (
-                <section
-                  key={key}
-                  className={cn(
-                    "party-setup-card space-y-4 rounded-xl border bg-background/60 p-4 shadow-sm transition",
-                    "hover:shadow-md focus-within:ring-2 focus-within:ring-primary/40"
-                  )}
-                  style={{
-                    "--party-setup-accent": normalizedColor,
-                    "--party-setup-surface": toRgba(normalizedColor, 0.08),
-                    "--party-setup-border": toRgba(normalizedColor, 0.35),
-                  }}
-                >
-                  <header className="party-setup-card__header space-y-1">
-                    <div className="flex items-center justify-between gap-2">
-                      <h3 className="party-setup-card__title text-sm font-semibold tracking-wide text-muted-foreground uppercase">
-                        {fallbackName}
-                      </h3>
-                      <span className="party-setup-card__badge inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-medium">
-                        <span className="party-setup-card__badge-dot inline-block h-2.5 w-2.5 rounded-full border" style={{ backgroundColor: normalizedColor }} />
-                        {displayName}
-                      </span>
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      Pick a color that feels right for {displayName} and we'll use it throughout the toolkit.
-                    </p>
-                  </header>
+          {/* Versus layout */}
+          <div className="grid gap-4 md:grid-cols-[1fr_auto_1fr] items-start">
+            <PartySetupCard
+              partyKey="A"
+              displayName={partyANameValue || "Party A"}
+              fallbackName="Party A"
+              color={partyAColorValue}
+              normalizedColor={normalizedPartyAColor}
+              onColorChange={(v) => handlePartyColorChange("A", v)}
+              onNameChange={(v) => handlePartyNameChange("A", v)}
+              selectedEmoji={formData.partyAEmoji || ""}
+              onEmojiChange={(v) => handlePartyEmojiChange("A", v)}
+              nameValue={partyANameValue}
+              error={step1Errors.partyAName?.message}
+              colorFieldProps={getPartyFieldProps("A", { variant: "simple", showBadge: false, showStripe: false })}
+              nameFieldProps={getPartyFieldProps("A", { showBadge: false, showStripe: false })}
+              toRgba={toRgba}
+              normalizePartyColor={normalizePartyColor}
+              accentColor={partyAccents.A.color}
+              side="left"
+            />
 
-                  <div className="flex flex-col gap-4 md:flex-row md:items-start md:gap-6">
-                    <div className="flex-1 space-y-2 md:max-w-[240px] md:flex-none">
-                      <FormField
-                        {...colorFieldProps}
-                        id={`party${key}Color`}
-                        label={`${displayName} color`}
-                        type="color"
-                        value={colorValue}
-                        onChange={(value) => handlePartyColorChange(key, value)}
-                        inputClassName="party-color-input"
-                      />
-                      <div className="flex flex-wrap items-center gap-2">
-                        {RECOMMENDED_PARTY_COLORS.map((color) => {
-                          const normalizedOption = normalizePartyColor(color, partyAccents[key].color);
-                          const isActive = normalizedOption === normalizedColor;
-                          return (
-                            <button
-                              key={`${key}-${color}`}
-                              type="button"
-                              className={cn(
-                                "h-8 w-8 rounded-full border border-border transition-transform",
-                                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary",
-                                isActive ? "ring-2 ring-offset-2 ring-offset-background ring-primary" : "hover:scale-105"
-                              )}
-                              style={{ backgroundColor: color }}
-                              onClick={() => handlePartyColorChange(key, color)}
-                              aria-label={`Use ${color} for ${displayName}`}
-                            >
-                              <span className="sr-only">Use {color} for {displayName}</span>
-                            </button>
-                          );
-                        })}
-                        <span className="text-[11px] text-muted-foreground font-mono ml-1">
-                          {normalizedColor}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="flex-1 space-y-1">
-                      <EnhancedFormField
-                        {...nameFieldProps}
-                        id={`party${key}Name`}
-                        label={`${fallbackName} name`}
-                        placeholder={key === "A" ? "Enter first person's name" : "Enter second person's name"}
-                        value={nameValue}
-                        onChange={(value) => handlePartyNameChange(key, value)}
-                        error={error}
-                        required={true}
-                        description={
-                          key === "A"
-                            ? "This helps us personalize prompts for the first person involved"
-                            : "We'll tailor future reflections for the second person automatically"
-                        }
-                        autoSave={true}
-                      />
-                    </div>
-                  </div>
-                </section>
-              );
-            })}
-          </div>
-
-          <div className="rounded-lg border bg-muted/40 p-3 sm:p-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex flex-wrap items-center gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={handleSwapPartyColors}
-                className="party-accent-actions__button"
-                disabled={isSameAccent}
+            {/* Central VS divider */}
+            <div className="hidden md:flex flex-col items-center justify-center self-center gap-2 py-8">
+              <motion.div
+                initial={{ scale: 0, rotate: -180 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.3 }}
+                className="relative"
               >
-                <ArrowLeftRight className="h-4 w-4 mr-2" aria-hidden="true" /> Swap colors
-              </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={handleResetPartyColors}
-                className="party-accent-actions__button"
-                disabled={isUsingDefaultPalette}
-                aria-label="Restore default party colors"
-              >
-                <RefreshCcw className="h-4 w-4 mr-2" aria-hidden="true" /> Restore defaults
-              </Button>
+                <div className="h-16 w-16 rounded-full bg-muted border-2 border-border flex items-center justify-center shadow-lg">
+                  <span className="text-lg font-bold text-muted-foreground">VS</span>
+                </div>
+              </motion.div>
+              <div className="w-px h-12 bg-gradient-to-b from-border to-transparent" />
             </div>
-            <p className="text-xs text-muted-foreground sm:text-sm">
-              You can always revisit this step to adjust names or colors if anything changes.
-            </p>
-          </div>
 
-          <div className="party-accent-preview-grid">
-            {Object.entries(partyDetails).map(([key, details]) => {
-              const liveName = (key === "A" ? partyANameValue : partyBNameValue) || details.name;
-              const liveAccent = createAccentConfig(
-                key === "A" ? normalizedPartyAColor : normalizedPartyBColor,
-                DEFAULT_PARTY_COLORS[key]
-              );
+            {/* Mobile VS divider */}
+            <div className="flex md:hidden items-center gap-3 py-2">
+              <div className="flex-1 h-px bg-border" />
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: "spring", delay: 0.2 }}
+                className="h-10 w-10 rounded-full bg-muted border border-border flex items-center justify-center shadow-sm"
+              >
+                <span className="text-xs font-bold text-muted-foreground">VS</span>
+              </motion.div>
+              <div className="flex-1 h-px bg-border" />
+            </div>
 
-              return (
-                <PartyAccentPreviewCard
-                  key={key}
-                  partyKey={key}
-                  details={{
-                    ...details,
-                    name: liveName,
-                    accent: liveAccent,
-                  }}
-                  surfaces={themeSurfaces}
-                />
-              );
-            })}
+            <PartySetupCard
+              partyKey="B"
+              displayName={partyBNameValue || "Party B"}
+              fallbackName="Party B"
+              color={partyBColorValue}
+              normalizedColor={normalizedPartyBColor}
+              onColorChange={(v) => handlePartyColorChange("B", v)}
+              onNameChange={(v) => handlePartyNameChange("B", v)}
+              selectedEmoji={formData.partyBEmoji || ""}
+              onEmojiChange={(v) => handlePartyEmojiChange("B", v)}
+              nameValue={partyBNameValue}
+              error={step1Errors.partyBName?.message}
+              colorFieldProps={getPartyFieldProps("B", { variant: "simple", showBadge: false, showStripe: false })}
+              nameFieldProps={getPartyFieldProps("B", { showBadge: false, showStripe: false })}
+              toRgba={toRgba}
+              normalizePartyColor={normalizePartyColor}
+              accentColor={partyAccents.B.color}
+              side="right"
+            />
           </div>
 
           <SectionSeparator title="Conflict Overview" />
