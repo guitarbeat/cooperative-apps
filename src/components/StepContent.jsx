@@ -736,12 +736,12 @@ const StepContent = ({ step, formData, updateFormData, updateMultipleFields, onE
           <CategoryHeader step={step} />
           <SectionSeparator title="Personalize each party" />
 
-          {/* Friendly onboarding micro-copy */}
+          {/* Friendly onboarding micro-copy - 3D card */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
-            className="rounded-xl border border-primary/15 bg-gradient-to-r from-primary/5 to-transparent p-4 sm:p-5 flex items-start gap-4"
+            className="onboarding-card-3d rounded-xl border border-primary/15 bg-gradient-to-r from-primary/5 to-transparent p-4 sm:p-5 flex items-start gap-4"
           >
             <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
               <Handshake className="h-5 w-5 text-primary" aria-hidden="true" />
@@ -756,8 +756,8 @@ const StepContent = ({ step, formData, updateFormData, updateMultipleFields, onE
             </div>
           </motion.div>
 
-          {/* Versus layout */}
-          <div className="grid gap-4 md:grid-cols-[1fr_auto_1fr] items-start">
+          {/* Versus layout - perspective for 3D card tilt */}
+          <div className="grid gap-4 md:grid-cols-[1fr_auto_1fr] items-start" style={{ perspective: "1200px" }}>
             <PartySetupCard
               partyKey="A"
               displayName={partyANameValue || "Party A"}
@@ -778,16 +778,16 @@ const StepContent = ({ step, formData, updateFormData, updateMultipleFields, onE
               side="left"
             />
 
-            {/* Central VS divider with color actions */}
+            {/* Central VS divider with color actions - 3D sphere */}
             <div className="hidden md:flex flex-col items-center justify-center self-center gap-3 py-8">
               <motion.div
                 initial={{ scale: 0, rotate: -180 }}
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.3 }}
-                className="relative"
+                className="relative vs-divider-3d"
               >
-                <div className="h-16 w-16 rounded-full bg-muted border-2 border-border flex items-center justify-center shadow-lg">
-                  <span className="text-lg font-bold text-muted-foreground">VS</span>
+                <div className="h-16 w-16 rounded-full vs-sphere flex items-center justify-center">
+                  <span className="text-lg font-bold text-muted-foreground drop-shadow-sm">VS</span>
                 </div>
               </motion.div>
               <div className="flex flex-col gap-1.5 w-full max-w-[140px]">
@@ -827,9 +827,9 @@ const StepContent = ({ step, formData, updateFormData, updateMultipleFields, onE
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ type: "spring", delay: 0.2 }}
-                  className="h-10 w-10 rounded-full bg-muted border border-border flex items-center justify-center shadow-sm shrink-0"
+                  className="h-10 w-10 rounded-full vs-sphere vs-sphere--sm flex items-center justify-center shrink-0"
                 >
-                  <span className="text-xs font-bold text-muted-foreground">VS</span>
+                  <span className="text-xs font-bold text-muted-foreground drop-shadow-sm">VS</span>
                 </motion.div>
                 <div className="flex-1 h-px bg-border" />
               </div>

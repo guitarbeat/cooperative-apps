@@ -46,9 +46,14 @@ const PartySetupCard = ({
       initial={{ opacity: 0, y: 20, scale: 0.97 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ duration: 0.4, delay: side === "left" ? 0 : 0.15 }}
+      whileHover={{
+        rotateY: side === "left" ? -2 : 2,
+        scale: 1.01,
+        transition: { duration: 0.25 },
+      }}
       className={cn(
-        "party-setup-card group space-y-5 rounded-xl border bg-background/60 p-5 shadow-sm transition-all duration-300 relative overflow-hidden",
-        "hover:shadow-lg hover:border-opacity-80 focus-within:ring-2 focus-within:ring-primary/40 focus-within:shadow-lg"
+        "party-setup-card party-setup-card--3d group space-y-5 rounded-xl border bg-background/60 p-5 transition-all duration-300 relative overflow-hidden",
+        "hover:border-opacity-80 focus-within:ring-2 focus-within:ring-primary/40"
       )}
       style={{
         "--party-setup-accent": normalizedColor,
@@ -69,9 +74,9 @@ const PartySetupCard = ({
           <h3 className="party-setup-card__title text-sm font-semibold tracking-wide text-muted-foreground uppercase">
             {fallbackName}
           </h3>
-          {/* Live identity badge - more prominent */}
+          {/* Live identity badge - more prominent, 3D pill */}
           <span
-            className="party-setup-card__badge inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium shadow-sm"
+            className="party-setup-card__badge party-setup-card__badge--3d inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium"
           >
             {selectedEmoji ? (
               <span className="text-base" aria-hidden="true">{selectedEmoji}</span>
@@ -157,19 +162,19 @@ const PartySetupCard = ({
                   <motion.button
                     key={`${partyKey}-${c}`}
                     type="button"
-                    whileHover={{ scale: 1.12 }}
-                    whileTap={{ scale: 0.92 }}
+                    whileHover={{ scale: 1.15, y: -2 }}
+                    whileTap={{ scale: 0.9, y: 1 }}
                     className={cn(
-                      "h-7 w-7 rounded-full border-2 transition-all",
+                      "party-color-swatch h-7 w-7 rounded-full border-2 transition-all",
                       "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary",
                       isActive
-                        ? "ring-2 ring-offset-2 ring-offset-background shadow-md"
-                        : "border-border/60 hover:border-border hover:shadow-sm bg-muted/20"
+                        ? "party-color-swatch--active ring-2 ring-offset-2 ring-offset-background"
+                        : "party-color-swatch--inactive border-border/60 hover:border-border"
                     )}
                     style={{
                       backgroundColor: c,
                       borderColor: isActive ? c : undefined,
-                      boxShadow: isActive ? `0 0 10px ${c}40` : undefined,
+                      boxShadow: isActive ? `0 0 12px ${c}50, 0 4px 8px rgba(0,0,0,0.15)` : undefined,
                     }}
                     onClick={() => onColorChange(c)}
                     aria-label={`Use ${c} for ${displayName}`}
