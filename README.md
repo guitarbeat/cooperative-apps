@@ -8,6 +8,7 @@ House Love connects cooperative housing communities with:
 - **Conflict Mediators**: Find qualified mediators for community disputes
 - **Resource Sharing**: Share and discover community resources
 - **Community Building**: Tools and resources for sustainable cooperative living
+- **Training Materials**: Comprehensive training resources for cooperative housing trustees on culture development and conflict resolution
 
 ## 🚀 Features
 
@@ -18,6 +19,7 @@ House Love connects cooperative housing communities with:
 - **Interactive Map** using Leaflet + React Leaflet
 - **Responsive Design** with SCSS
 - **Theme Toggle** for light and dark modes
+- **Training Materials**: Comprehensive documentation, worksheets, case studies, and interactive tools for cooperative housing culture and conflict resolution
 
 ## 🛠️ Tech Stack
 
@@ -81,6 +83,16 @@ src/
 ├── App.scss
 ├── index.js
 └── ...
+docs/
+├── activities/          # Role-playing scenarios and facilitator guides
+├── workbook/           # Training worksheets and case studies
+│   ├── case_studies/
+│   └── worksheets/
+└── training/           # Additional training materials
+resources/
+└── policy_templates/   # Customizable policy templates
+public/
+└── training-tools/     # Interactive web-based training tools
 ```
 
 ## 🧪 Scripts
@@ -120,6 +132,21 @@ src/
 ## 📝 License
 
 This project is licensed under the MIT License — see the `LICENSE` file.
+
+## 📚 Training Materials
+
+This repository includes comprehensive training materials for cooperative housing trustees:
+
+- **Training Activities** (`/docs/activities/`): Role-playing scenarios and facilitator guides for hands-on learning
+- **Workbook Materials** (`/docs/workbook/`): Worksheets and case studies for individual and group exercises
+- **Policy Templates** (`/resources/policy_templates/`): Customizable templates for cooperative policies
+- **Interactive Tools** (`/public/training-tools/`): Web-based interactive tools for conflict resolution, communication assessment, and policy development
+
+### Accessing Training Materials
+
+- **Web Tools**: Navigate to `/training-tools/index.html` in your browser after starting the development server, or access via `http://localhost:3000/training-tools/index.html`
+- **Documentation**: All markdown files in `/docs/` can be viewed directly or integrated into your documentation system
+- **Resources**: Policy templates are available in `/resources/policy_templates/` for customization
 
 ## 🆘 Support
 
