@@ -1,0 +1,83 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, cursor/**, feature/** ]
+  pull_request:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Setup pnpm first so it is available for setup-node caching
+      - name: Setup pnpm
+        id: setup-pnpm
+        uses: pnpm/action-setup@v4.1.0
+        with:
+          version: 10.4.1
+        continue-on-error: true
+
+      - name: Install pnpm manually (fallback)
+        if: steps.setup-pnpm.outcome == 'failure'
+        run: |
+          echo "pnpm/action-setup failed, installing pnpm manually..."
+          # Assuming system node/npm is available or we might need to rely on setup-node running later?
+          # Actually, if we need npm here, we might be using the pre-installed one on the runner.
+          npm install -g pnpm@10.4.1
+          echo "pnpm installed successfully"
+          echo "Verifying pnpm installation..."
+          ls -la $(which pnpm) || echo "pnpm binary not found"
+          chmod +x $(which pnpm) || echo "Could not make pnpm executable"
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Debug environment
+        run: |
+          echo "Node version: $(node --version)"
+          echo "NPM version: $(npm --version)"
+          echo "PATH: $PATH"
+          echo "Current directory: $(pwd)"
+          echo "Available commands:"
+          which node npm || echo "Node/npm not found in PATH"
+
+      - name: Check pnpm version
+        run: |
+          echo "Checking pnpm installation..."
+          echo "PATH: $PATH"
+          which pnpm || echo "pnpm not found in PATH"
+          pnpm --version
+          echo "Expected version: 10.4.1"
+          echo "pnpm is available and working"
+
+      - name: Final pnpm verification
+        run: |
+          echo "Final verification before running pnpm commands..."
+          pnpm --version
+          echo "pnpm is ready to use"
+          echo "Checking pnpm configuration..."
+          pnpm config list || echo "Could not list pnpm config"
+
+      - name: Check lockfile
+        run: |
+          echo "Checking for pnpm lockfile..."
+          ls -la pnpm-lock.yaml || echo "pnpm-lock.yaml not found"
+          echo "Lockfile exists, proceeding with installation"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm run lint
+
+      - name: Build
+        run: pnpm run build
+
+      - name: Test
+        run: pnpm run test

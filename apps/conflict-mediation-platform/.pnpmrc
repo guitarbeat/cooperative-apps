@@ -1,0 +1,4 @@
+enable-pre-post-scripts=true
+unsafe-perm=true
+ignore-scripts=false
+scripts-prepend-node-path=true
