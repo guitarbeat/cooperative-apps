@@ -736,25 +736,28 @@ const StepContent = ({ step, formData, updateFormData, updateMultipleFields, onE
           <CategoryHeader step={step} />
           <SectionSeparator title="Personalize each party" />
 
-          {/* Friendly onboarding micro-copy */}
+          {/* Friendly onboarding micro-copy - 3D card */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="rounded-lg border bg-card/40 p-3 sm:p-4 flex items-start gap-3"
+            transition={{ duration: 0.3 }}
+            className="onboarding-card-3d rounded-xl border border-primary/15 bg-gradient-to-r from-primary/5 to-transparent p-4 sm:p-5 flex items-start gap-4"
           >
-            <Handshake className="h-5 w-5 text-primary shrink-0 mt-0.5" aria-hidden="true" />
-            <div className="space-y-1">
-              <p className="text-sm sm:text-base text-foreground font-medium">
-                👋 Let's get to know both sides!
+            <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+              <Handshake className="h-5 w-5 text-primary" aria-hidden="true" />
+            </div>
+            <div className="space-y-1.5 min-w-0">
+              <p className="text-sm sm:text-base text-foreground font-semibold">
+                Let's get to know both sides
               </p>
-              <p className="text-xs sm:text-sm text-muted-foreground">
-                Pick an emoji avatar, choose a color, and add each person's name. These will follow you through the whole mediation journey.
+              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                Add each person's name, pick an avatar emoji, and choose a color. These will appear throughout the mediation to keep things clear and personal.
               </p>
             </div>
           </motion.div>
 
-          {/* Versus layout */}
-          <div className="grid gap-4 md:grid-cols-[1fr_auto_1fr] items-start">
+          {/* Versus layout - perspective for 3D card tilt */}
+          <div className="grid gap-4 md:grid-cols-[1fr_auto_1fr] items-start" style={{ perspective: "1200px" }}>
             <PartySetupCard
               partyKey="A"
               displayName={partyANameValue || "Party A"}
@@ -775,33 +778,87 @@ const StepContent = ({ step, formData, updateFormData, updateMultipleFields, onE
               side="left"
             />
 
-            {/* Central VS divider */}
-            <div className="hidden md:flex flex-col items-center justify-center self-center gap-2 py-8">
+            {/* Central VS divider with color actions - 3D sphere */}
+            <div className="hidden md:flex flex-col items-center justify-center self-center gap-3 py-8">
               <motion.div
                 initial={{ scale: 0, rotate: -180 }}
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.3 }}
-                className="relative"
+                className="relative vs-divider-3d"
               >
-                <div className="h-16 w-16 rounded-full bg-muted border-2 border-border flex items-center justify-center shadow-lg">
-                  <span className="text-lg font-bold text-muted-foreground">VS</span>
+                <div className="h-16 w-16 rounded-full vs-sphere flex items-center justify-center">
+                  <span className="text-lg font-bold text-muted-foreground drop-shadow-sm">VS</span>
                 </div>
               </motion.div>
-              <div className="w-px h-12 bg-gradient-to-b from-border to-transparent" />
+              <div className="flex flex-col gap-1.5 w-full max-w-[140px]">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleSwapPartyColors}
+                  className="w-full gap-1.5 text-xs"
+                  aria-label="Swap party colors"
+                >
+                  <ArrowLeftRight className="h-3.5 w-3.5" />
+                  Swap colors
+                </Button>
+                {!isUsingDefaultPalette && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleResetPartyColors}
+                    className="w-full gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+                    aria-label="Reset to default colors"
+                  >
+                    <RefreshCcw className="h-3.5 w-3.5" />
+                    Reset colors
+                  </Button>
+                )}
+              </div>
+              <div className="w-px h-8 bg-gradient-to-b from-border to-transparent" />
             </div>
 
-            {/* Mobile VS divider */}
-            <div className="flex md:hidden items-center gap-3 py-2">
-              <div className="flex-1 h-px bg-border" />
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: "spring", delay: 0.2 }}
-                className="h-10 w-10 rounded-full bg-muted border border-border flex items-center justify-center shadow-sm"
-              >
-                <span className="text-xs font-bold text-muted-foreground">VS</span>
-              </motion.div>
-              <div className="flex-1 h-px bg-border" />
+            {/* Mobile VS divider with color actions */}
+            <div className="flex md:hidden flex-col items-center gap-3 py-4">
+              <div className="flex items-center gap-3 w-full">
+                <div className="flex-1 h-px bg-border" />
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: "spring", delay: 0.2 }}
+                  className="h-10 w-10 rounded-full vs-sphere vs-sphere--sm flex items-center justify-center shrink-0"
+                >
+                  <span className="text-xs font-bold text-muted-foreground drop-shadow-sm">VS</span>
+                </motion.div>
+                <div className="flex-1 h-px bg-border" />
+              </div>
+              <div className="flex gap-2 w-full justify-center">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleSwapPartyColors}
+                  className="gap-1.5 text-xs"
+                  aria-label="Swap party colors"
+                >
+                  <ArrowLeftRight className="h-3.5 w-3.5" />
+                  Swap
+                </Button>
+                {!isUsingDefaultPalette && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleResetPartyColors}
+                    className="gap-1.5 text-xs text-muted-foreground"
+                    aria-label="Reset to default colors"
+                  >
+                    <RefreshCcw className="h-3.5 w-3.5" />
+                    Reset
+                  </Button>
+                )}
+              </div>
             </div>
 
             <PartySetupCard
