@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Input } from '../../shared/ui/input';
 import { Textarea } from '../../shared/ui/textarea';
 import { Button } from '../../shared/ui/button';
@@ -11,6 +11,13 @@ const ContactForm = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState(null); // 'success' | 'error' | null
+  const successRef = useRef(null);
+
+  useEffect(() => {
+    if (submitStatus === 'success' && successRef.current) {
+      successRef.current.focus();
+    }
+  }, [submitStatus]);
 
   const handleChange = e => {
     const { name, value } = e.target;
@@ -38,7 +45,12 @@ const ContactForm = () => {
 
   if (submitStatus === 'success') {
     return (
-      <div className="bg-green-50 text-green-800 p-4 rounded-md mb-4 border border-green-200" role="alert">
+      <div
+        ref={successRef}
+        tabIndex={-1}
+        className="bg-green-50 text-green-800 p-4 rounded-md mb-4 border border-green-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+        role="alert"
+      >
         <h2 className="font-semibold text-lg mb-1">Message Sent!</h2>
         <p>Thanks for reaching out. We'll get back to you soon.</p>
         <Button

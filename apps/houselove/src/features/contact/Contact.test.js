@@ -40,5 +40,6 @@ test('renders contact form with accessible labels and submits', async () => {
   // Wait for success message (this will also fail initially)
   await waitFor(() => {
     expect(screen.getByText(/message sent/i)).toBeInTheDocument();
+    expect(screen.getByRole('alert')).toHaveFocus();
   }, { timeout: 2000 });
 });
