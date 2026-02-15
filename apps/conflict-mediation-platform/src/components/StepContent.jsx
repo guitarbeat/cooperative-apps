@@ -62,124 +62,6 @@ const normalizePartyColor = (value, fallback) => {
   return "#2563EB";
 };
 
-const FALLBACK_THEME_SURFACES = {
-  light: "#F8FAFC",
-  dark: "#0F172A",
-};
-
-const rgbComponentToHex = (value) => {
-  const int = Math.max(0, Math.min(255, Number.parseInt(value, 10)));
-  return int.toString(16).padStart(2, "0").toUpperCase();
-};
-
-const parseCssColorToHex = (value, fallback) => {
-  if (!value) return fallback;
-  const candidate = value.trim();
-  if (HEX_COLOR_PATTERN.test(candidate)) {
-    return expandHex(candidate);
-  }
-
-  const rgbMatch = candidate.match(/^rgba?\((\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})/i);
-  if (rgbMatch) {
-    const [, r, g, b] = rgbMatch;
-    return `#${rgbComponentToHex(r)}${rgbComponentToHex(g)}${rgbComponentToHex(b)}`;
-  }
-
-  if (typeof window === "undefined" || !document.body) {
-    return fallback;
-  }
-
-  const probe = document.createElement("span");
-  probe.style.color = candidate;
-  probe.style.display = "none";
-  document.body.appendChild(probe);
-  const computedColor = getComputedStyle(probe).color;
-  document.body.removeChild(probe);
-
-  if (computedColor && computedColor !== candidate) {
-    return parseCssColorToHex(computedColor, fallback);
-  }
-
-  return fallback;
-};
-
-const getThemeSurfaceColors = () => {
-  if (typeof window === "undefined" || !document.body) {
-    return FALLBACK_THEME_SURFACES;
-  }
-
-  const fallbackLight = FALLBACK_THEME_SURFACES.light;
-  const fallbackDark = FALLBACK_THEME_SURFACES.dark;
-
-  const rootComputed = getComputedStyle(document.documentElement);
-  const lightCandidate =
-    rootComputed.getPropertyValue("--background").trim() ||
-    rootComputed.getPropertyValue("--card").trim();
-  const light = parseCssColorToHex(lightCandidate, fallbackLight);
-
-  const probe = document.createElement("div");
-  probe.className = "dark";
-  probe.style.display = "none";
-  document.body.appendChild(probe);
-  const darkComputed = getComputedStyle(probe);
-  const darkCandidate =
-    darkComputed.getPropertyValue("--background").trim() ||
-    darkComputed.getPropertyValue("--card").trim();
-  const dark = parseCssColorToHex(darkCandidate, fallbackDark);
-  document.body.removeChild(probe);
-
-  return { light, dark };
-};
-
-const useThemeContrastSurfaces = () => {
-  const [surfaces, setSurfaces] = React.useState(() => ({ ...FALLBACK_THEME_SURFACES }));
-
-  React.useEffect(() => {
-    if (typeof window === "undefined") return undefined;
-
-    const updateSurfaces = () => {
-      setSurfaces(getThemeSurfaceColors());
-    };
-
-    updateSurfaces();
-
-    const observer = typeof MutationObserver !== "undefined"
-      ? new MutationObserver(updateSurfaces)
-      : null;
-    if (observer) {
-      observer.observe(document.documentElement, {
-        attributes: true,
-        attributeFilter: ["class"],
-      });
-    }
-
-    const mediaQuery = typeof window.matchMedia === "function"
-      ? window.matchMedia("(prefers-color-scheme: dark)")
-      : null;
-    if (mediaQuery) {
-      const handler = () => updateSurfaces();
-      if (typeof mediaQuery.addEventListener === "function") {
-        mediaQuery.addEventListener("change", handler);
-      } else if (typeof mediaQuery.addListener === "function") {
-        mediaQuery.addListener(handler);
-      }
-      return () => {
-        observer?.disconnect();
-        if (typeof mediaQuery.removeEventListener === "function") {
-          mediaQuery.removeEventListener("change", handler);
-        } else if (typeof mediaQuery.removeListener === "function") {
-          mediaQuery.removeListener(handler);
-        }
-      };
-    }
-
-    return () => {
-      observer?.disconnect();
-    };
-  }, []);
-
-  return surfaces;
-};
 
 const hexToRgb = (hexColor) => {
   const expanded = expandHex(hexColor).replace("#", "");
@@ -210,27 +92,6 @@ const getReadableTextColor = (hexColor) => {
   return luminance > 0.5 ? "#1E293B" : "#F8FAFC";
 };
 
-const getContrastRatio = (hexColorA, hexColorB) => {
-  const luminanceA = getRelativeLuminance(hexColorA);
-  const luminanceB = getRelativeLuminance(hexColorB);
-  const [lighter, darker] = luminanceA > luminanceB ? [luminanceA, luminanceB] : [luminanceB, luminanceA];
-  return (lighter + 0.05) / (darker + 0.05);
-};
-
-const formatContrastRatio = (ratio) => {
-  if (!Number.isFinite(ratio)) return "–";
-  const precision = ratio >= 10 ? 1 : 2;
-  const rounded = Number(ratio.toFixed(precision));
-  return `${rounded}:1`;
-};
-
-const getContrastLabel = (ratio) => {
-  if (!Number.isFinite(ratio)) return "Unknown contrast";
-  if (ratio >= 7) return "Excellent (AAA)";
-  if (ratio >= 4.5) return "Great (AA)";
-  if (ratio >= 3) return "Readable (AA Large)";
-  return "Low contrast";
-};
 
 const createAccentConfig = (color, fallback) => {
   const normalized = normalizePartyColor(color, fallback);
@@ -252,46 +113,6 @@ const createAccentConfig = (color, fallback) => {
       "--party-accent-badge-text": getReadableTextColor(normalized),
     },
   };
-};
-
-const PartyAccentPreviewCard = ({ partyKey, details, surfaces }) => {
-  if (!details?.accent) return null;
-
-  const themeSurfaces = surfaces || FALLBACK_THEME_SURFACES;
-  const contrastOnLight = getContrastRatio(details.accent.color, themeSurfaces.light);
-  const contrastOnDark = getContrastRatio(details.accent.color, themeSurfaces.dark);
-  const lightBorderColor = toRgba(getReadableTextColor(themeSurfaces.light), 0.2);
-  const darkBorderColor = toRgba(getReadableTextColor(themeSurfaces.dark), 0.3);
-
-  return (
-    <div
-      className="party-accent-preview-card"
-      style={{
-        ...details.accent.styles,
-        "--party-preview-light-color": themeSurfaces.light,
-        "--party-preview-dark-color": themeSurfaces.dark,
-        "--party-preview-light-border": lightBorderColor,
-        "--party-preview-dark-border": darkBorderColor,
-      }}
-      data-party-key={partyKey}
-    >
-      <div className="party-accent-preview-chip">
-        <span className="party-accent-preview-name">{details.name}</span>
-        <span className="party-accent-preview-hex">{details.accent.color}</span>
-      </div>
-      <p className="party-accent-preview-label">{getContrastLabel(contrastOnLight)} on light backgrounds</p>
-      <div className="party-accent-preview-contrast">
-        <span>
-          <span className="party-accent-preview-dot" aria-hidden="true" />
-          Light: {formatContrastRatio(contrastOnLight)}
-        </span>
-        <span>
-          <span className="party-accent-preview-dot party-accent-preview-dot--dark" aria-hidden="true" />
-          Dark: {formatContrastRatio(contrastOnDark)}
-        </span>
-      </div>
-    </div>
-  );
 };
 
 // * Category Header component
@@ -535,8 +356,6 @@ const StepContent = ({ step, formData, updateFormData, updateMultipleFields, onE
       accent: partyAccents.B,
     },
   }), [formData.partyAName, formData.partyBName, partyAccents]);
-
-  const themeSurfaces = useThemeContrastSurfaces();
 
   const getPartyFieldProps = (
     party,
