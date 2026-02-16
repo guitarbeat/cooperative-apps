@@ -5,6 +5,7 @@ import React, {
   useCallback,
   useMemo,
 } from "react";
+import { X } from "lucide-react";
 import { Badge } from "./ui/badge";
 
 // * Constants for emotion mapping and configuration
@@ -580,10 +581,16 @@ const EmotionWordsSelector = React.memo(
                 {recommended.map((word) => (
                   <Badge
                     key={word}
+                    asChild
                     className={`cursor-pointer transition-all duration-300 hover:scale-105 ${getWordStyling(word)}`}
-                    onClick={() => toggleEmotionWord(word)}
                   >
-                    {word}
+                    <button
+                      type="button"
+                      onClick={() => toggleEmotionWord(word)}
+                      aria-pressed={selectedEmotionWords.includes(word)}
+                    >
+                      {word}
+                    </button>
                   </Badge>
                 ))}
               </div>
@@ -600,10 +607,16 @@ const EmotionWordsSelector = React.memo(
                   .map((word) => (
                     <Badge
                       key={word}
+                      asChild
                       className={`cursor-pointer transition-all duration-200 hover:scale-105 ${getWordStyling(word)}`}
-                      onClick={() => toggleEmotionWord(word)}
                     >
-                      {word}
+                      <button
+                        type="button"
+                        onClick={() => toggleEmotionWord(word)}
+                        aria-pressed={selectedEmotionWords.includes(word)}
+                      >
+                        {word}
+                      </button>
                     </Badge>
                   ))}
               </div>
@@ -624,9 +637,16 @@ const EmotionWordsSelector = React.memo(
               {selectedEmotionWords.map((word) => (
                 <Badge
                   key={word}
-                  className={`bg-gradient-to-r ${colors.primary} text-white border-0 shadow-md`}
+                  asChild
+                  className={`bg-gradient-to-r ${colors.primary} text-white border-0 shadow-md cursor-pointer hover:scale-105 transition-transform`}
                 >
-                  {word}
+                  <button
+                    type="button"
+                    onClick={() => toggleEmotionWord(word)}
+                    aria-label={`Remove ${word}`}
+                  >
+                    {word} <X className="ml-1 h-3 w-3" />
+                  </button>
                 </Badge>
               ))}
             </div>
