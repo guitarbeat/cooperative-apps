@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Input } from '../../shared/ui/input';
 import { Textarea } from '../../shared/ui/textarea';
 import { Button } from '../../shared/ui/button';
+import { validateContactForm, sanitizeInput } from '../../lib/validation';
 
 const ContactForm = () => {
   const [formData, setFormData] = useState({
@@ -9,6 +10,7 @@ const ContactForm = () => {
     email: '',
     message: '',
   });
+  const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState(null); // 'success' | 'error' | null
   const successRef = useRef(null);
@@ -22,18 +24,36 @@ const ContactForm = () => {
   const handleChange = e => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+    // Clear error when user types
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }));
+    }
   };
 
   const handleSubmit = async e => {
     e.preventDefault();
     setIsSubmitting(true);
     setSubmitStatus(null);
+    setErrors({});
+
+    const validationErrors = validateContactForm(formData);
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      setIsSubmitting(false);
+      return;
+    }
+
+    const sanitizedData = {
+      name: sanitizeInput(formData.name),
+      email: formData.email, // Email is validated by regex, no need to strip chars unless we fear email injection which regex prevents
+      message: sanitizeInput(formData.message),
+    };
 
     // Simulate API call
     try {
       await new Promise(resolve => setTimeout(resolve, 1500));
       // EmailJS integration will go here
-      console.log('Form submitted:', formData);
+      console.log('Form submitted:', sanitizedData);
       setSubmitStatus('success');
       setFormData({ name: '', email: '', message: '' });
     } catch (error) {
@@ -65,7 +85,7 @@ const ContactForm = () => {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-6" noValidate>
       <div className="flex flex-col gap-2">
         <label htmlFor="name" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
           Your Name <span className="text-red-500" aria-hidden="true">*</span>
@@ -79,7 +99,15 @@ const ContactForm = () => {
           onChange={handleChange}
           required
           disabled={isSubmitting}
+          className={errors.name ? 'border-red-500 focus-visible:ring-red-500' : ''}
+          aria-invalid={!!errors.name}
+          aria-describedby={errors.name ? 'name-error' : undefined}
         />
+        {errors.name && (
+          <p id="name-error" className="text-red-500 text-sm mt-1" role="alert">
+            {errors.name}
+          </p>
+        )}
       </div>
 
       <div className="flex flex-col gap-2">
@@ -95,7 +123,15 @@ const ContactForm = () => {
           onChange={handleChange}
           required
           disabled={isSubmitting}
+          className={errors.email ? 'border-red-500 focus-visible:ring-red-500' : ''}
+          aria-invalid={!!errors.email}
+          aria-describedby={errors.email ? 'email-error' : undefined}
         />
+        {errors.email && (
+          <p id="email-error" className="text-red-500 text-sm mt-1" role="alert">
+            {errors.email}
+          </p>
+        )}
       </div>
 
       <div className="flex flex-col gap-2">
@@ -110,8 +146,15 @@ const ContactForm = () => {
           onChange={handleChange}
           required
           disabled={isSubmitting}
-          className="min-h-[120px]"
+          className={`min-h-[120px] ${errors.message ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
+          aria-invalid={!!errors.message}
+          aria-describedby={errors.message ? 'message-error' : undefined}
         />
+        {errors.message && (
+          <p id="message-error" className="text-red-500 text-sm mt-1" role="alert">
+            {errors.message}
+          </p>
+        )}
       </div>
 
       <Button type="submit" isLoading={isSubmitting} className="w-full sm:w-auto">
