@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { debounce } from '../lib/utils';
 
 const ParticleBackground = () => {
   const canvasRef = useRef(null);
@@ -20,7 +21,9 @@ const ParticleBackground = () => {
     };
 
     resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
+    // ⚡ Bolt Optimization: Debounce resize to prevent excessive layout thrashing
+    const debouncedResize = debounce(resizeCanvas, 250);
+    window.addEventListener('resize', debouncedResize);
 
     // Particle class
     class Particle {
@@ -43,12 +46,12 @@ const ParticleBackground = () => {
         this.color = `rgba(107, 142, 71, ${this.life})`;
       }
 
-      update() {
+      // ⚡ Bolt Optimization: Accept 'now' timestamp to avoid Date.now() calls per particle
+      update(now) {
         this.x += this.vx;
         this.y += this.vy;
 
         if (this.fadingIn) {
-          const now = Date.now();
           if (now > this.fadeStart) {
             this.fade += 0.005;
             if (this.fade >= this.life) {
@@ -61,7 +64,7 @@ const ParticleBackground = () => {
           if (this.fade <= 0) {
             this.reset();
             this.fadeDelay = Math.random() * 600;
-            this.fadeStart = Date.now() + this.fadeDelay;
+            this.fadeStart = now + this.fadeDelay;
             this.fadingIn = true;
           }
         }
@@ -69,7 +72,7 @@ const ParticleBackground = () => {
         if (this.y < -10 || this.x < -10 || this.x > canvas.width + 10) {
           this.reset();
           this.fadeDelay = Math.random() * 600;
-          this.fadeStart = Date.now() + this.fadeDelay;
+          this.fadeStart = now + this.fadeDelay;
           this.fadingIn = true;
         }
       }
@@ -95,8 +98,11 @@ const ParticleBackground = () => {
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+      // ⚡ Bolt Optimization: Calculate timestamp once per frame
+      const now = Date.now();
+
       particles.forEach(particle => {
-        particle.update();
+        particle.update(now);
         particle.draw();
       });
 
@@ -106,7 +112,7 @@ const ParticleBackground = () => {
     animate();
 
     return () => {
-      window.removeEventListener('resize', resizeCanvas);
+      window.removeEventListener('resize', debouncedResize);
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
       }
