@@ -2,6 +2,7 @@ import React from "react";
 import { AlertTriangle, RefreshCw, Home, Bug, Copy, Check } from "lucide-react";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
+import { isDev } from "@/lib/utils";
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -68,11 +69,15 @@ class ErrorBoundary extends React.Component {
     const errorDetails = {
       errorId: this.state.errorId,
       message: this.state.error?.message,
-      stack: this.state.error?.stack,
-      componentStack: this.state.errorInfo?.componentStack,
       timestamp: new Date().toISOString(),
       retryCount: this.state.retryCount
     };
+
+    // Only include stack traces in development
+    if (isDev()) {
+      errorDetails.stack = this.state.error?.stack;
+      errorDetails.componentStack = this.state.errorInfo?.componentStack;
+    }
 
     try {
       await navigator.clipboard.writeText(JSON.stringify(errorDetails, null, 2));
