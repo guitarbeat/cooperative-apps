@@ -12,3 +12,7 @@
 ## 2024-05-25 - Label Focus for Custom Inputs
 **Learning:** Native `<label htmlFor="...">` only focuses standard form elements. For custom `div`-based inputs (even with `tabIndex`), you must manually handle the label's `onClick` to focus the trigger ref.
 **Action:** When building custom inputs, add `onClick={() => triggerRef.current?.focus()}` to the label.
+
+## 2026-02-15 - Missing Utility Classes
+**Learning:** `EnhancedFormField` relied on `animate-shake` which was missing from the CSS. Always verify utility classes exist, especially for animations, to avoid silent failures.
+**Action:** When adding utility classes for animations, verify they are defined in the design system or Tailwind config.
