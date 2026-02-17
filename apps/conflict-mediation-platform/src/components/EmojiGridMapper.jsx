@@ -674,6 +674,13 @@ const EmojiGridMapper = ({
     calculateEmotionData,
   } = useDragHandler(containerRef, containerSize, onChartPositionChange);
 
+  // * Optimize performance by memoizing the callback passed to DraggableEmoji
+  // * preventing unnecessary re-attaching of event listeners during drag operations
+  const handleEmojiStart = useCallback((event) => {
+    handleStart(event);
+    handleMove(event);
+  }, [handleStart, handleMove]);
+
   // * Initialize position based on props or center
   useEffect(() => {
     if (chartPosition) {
@@ -847,10 +854,7 @@ const EmojiGridMapper = ({
                 containerSize={containerSize}
                 isDragging={isDragging}
                 emotionData={currentEmotionData}
-                onStart={(event) => {
-                  handleStart(event);
-                  handleMove(event);
-                }}
+                onStart={handleEmojiStart}
                 onKeyDown={handleKeyDown}
               />
             )}

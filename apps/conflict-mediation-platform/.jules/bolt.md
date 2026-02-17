@@ -19,3 +19,7 @@ If `StepContent` re-renders (e.g. while typing), `context` is recreated. `SmartS
 ## 2024-05-23 - State Colocation for High-Frequency Updates
 **Learning:** `App.jsx` was re-rendering on every drag frame because `dragOffset` state was lifted up to `App` via `useNavigation` hook, even though `dragOffset` was only used by `CardStack` (a leaf component). This caused unnecessary re-renders of the entire app tree (Header, NavButtons, etc.) on every pixel of movement.
 **Action:** Extracted drag logic into `useCardSwipe` and colocated it within `CardStack`. `App` now only manages `currentStep` (low frequency), while `CardStack` manages `dragOffset` (high frequency). This isolates the re-render loop to the specific component that needs to animate.
+
+## 2024-05-24 - Event Listener Thrashing in Draggable Components
+**Learning:** `EmojiGridMapper` was passing an inline arrow function `(e) => { ... }` as the `onStart` prop to `DraggableEmoji`. This caused `DraggableEmoji`'s `useEffect` (which attaches `mousedown`/`touchstart` listeners) to clean up and re-run on *every single drag frame* (because `EmojiGridMapper` re-renders on drag move). This is extremely wasteful for high-frequency interactions.
+**Action:** Memoize callback functions passed to interactive components using `useCallback`, especially if those callbacks are dependencies of `useEffect` hooks inside the child component.
