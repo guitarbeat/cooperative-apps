@@ -230,6 +230,7 @@ const useDragHandler = (containerRef, containerSize, onChartPositionChange) => {
     y: DEFAULT_CONTAINER_SIZE / 2,
   });
   const frameRef = useRef(null);
+  const latestEmotionDataRef = useRef(null);
 
   // * Cleanup animation frame on unmount
   useEffect(() => {
@@ -329,8 +330,9 @@ const useDragHandler = (containerRef, containerSize, onChartPositionChange) => {
 
         setPosition(constrained);
 
+        // Calculate data but don't update parent yet to avoid excessive re-renders
         const emotionData = calculateEmotionData(constrained.x, constrained.y, containerSize);
-        onChartPositionChange(emotionData);
+        latestEmotionDataRef.current = emotionData;
       });
     },
     [
@@ -338,7 +340,6 @@ const useDragHandler = (containerRef, containerSize, onChartPositionChange) => {
       containerRef,
       containerSize,
       calculateEmotionData,
-      onChartPositionChange,
     ]
   );
 
@@ -359,17 +360,21 @@ const useDragHandler = (containerRef, containerSize, onChartPositionChange) => {
 
       setPosition(constrained);
 
-      if (onChartPositionChange) {
-        const emotionData = calculateEmotionData(constrained.x, constrained.y, containerSize);
-        onChartPositionChange(emotionData);
-      }
+      const emotionData = calculateEmotionData(constrained.x, constrained.y, containerSize);
+      latestEmotionDataRef.current = emotionData;
+
+      // Don't call onChartPositionChange here, it will be called in handleEnd
+      // This prevents double firing on single clicks and reduces re-renders
     },
-    [calculateEmotionData, containerRef, containerSize, onChartPositionChange]
+    [calculateEmotionData, containerRef, containerSize]
   );
 
   const handleEnd = useCallback(() => {
     setIsDragging(false);
-  }, []);
+    if (latestEmotionDataRef.current && onChartPositionChange) {
+      onChartPositionChange(latestEmotionDataRef.current);
+    }
+  }, [onChartPositionChange]);
 
   // * Event listeners management
   useEffect(() => {
