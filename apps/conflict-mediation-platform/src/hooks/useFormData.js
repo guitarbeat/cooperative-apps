@@ -1,5 +1,6 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { toast } from "sonner";
+import { debounce } from "../lib/utils";
 
 const initialState = {
     partyAName: "",
@@ -126,11 +127,18 @@ export const useFormData = () => {
         }
     }, []);
 
+    // Create a debounced save function that is stable across renders
+    // It will only execute after 500ms of inactivity, reducing overhead on every keystroke
+    const debouncedSave = useMemo(
+        () => debounce((data) => saveToStorage(data), 500),
+        [saveToStorage]
+    );
+
     useEffect(() => {
         if (loadedFromStorage) {
-            saveToStorage(formData);
+            debouncedSave(formData);
         }
-    }, [formData, loadedFromStorage, saveToStorage]);
+    }, [formData, loadedFromStorage, debouncedSave]);
 
     /**
      * Update a single form field
