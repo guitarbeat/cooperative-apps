@@ -2,6 +2,7 @@ import React from "react";
 import { AlertTriangle, RefreshCw, Home, Bug, Copy, Check } from "lucide-react";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
+import { isDev } from "../lib/utils";
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -26,7 +27,9 @@ class ErrorBoundary extends React.Component {
 
   componentDidCatch(error, errorInfo) {
     // Log error details for debugging
-    console.error('ErrorBoundary caught an error:', error, errorInfo);
+    if (isDev()) {
+      console.error('ErrorBoundary caught an error:', error, errorInfo);
+    }
     
     // Store error info for display
     this.setState({ errorInfo });
@@ -48,7 +51,9 @@ class ErrorBoundary extends React.Component {
     };
     
     // For now, just log to console
-    console.error('Error details:', errorData);
+    if (isDev()) {
+      console.error('Error details:', errorData);
+    }
   };
 
   handleRetry = () => {
@@ -68,11 +73,14 @@ class ErrorBoundary extends React.Component {
     const errorDetails = {
       errorId: this.state.errorId,
       message: this.state.error?.message,
-      stack: this.state.error?.stack,
-      componentStack: this.state.errorInfo?.componentStack,
       timestamp: new Date().toISOString(),
       retryCount: this.state.retryCount
     };
+
+    if (isDev()) {
+      errorDetails.stack = this.state.error?.stack;
+      errorDetails.componentStack = this.state.errorInfo?.componentStack;
+    }
 
     try {
       await navigator.clipboard.writeText(JSON.stringify(errorDetails, null, 2));
@@ -80,7 +88,9 @@ class ErrorBoundary extends React.Component {
       toast.success("Error details copied to clipboard");
       setTimeout(() => this.setState({ copied: false }), 2000);
     } catch (error) {
-      console.error("Failed to copy error details:", error);
+      if (isDev()) {
+        console.error("Failed to copy error details:", error);
+      }
       toast.error("Failed to copy error details");
     }
   };
