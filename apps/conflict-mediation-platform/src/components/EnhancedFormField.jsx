@@ -3,6 +3,8 @@ import { Check, X, AlertCircle, HelpCircle, Eye, EyeOff, Lightbulb } from "lucid
 import { cn } from "../lib/utils";
 import { SmartSuggestions, ContextualHelp } from "./SmartSuggestions";
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 const EnhancedFormField = ({
   id,
   label,
@@ -44,6 +46,7 @@ const EnhancedFormField = ({
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isValidating, setIsValidating] = useState(false);
   const [validationState, setValidationState] = useState("idle"); // idle, validating, valid, invalid
+  const [internalError, setInternalError] = useState("");
   const [autoSaveStatus, setAutoSaveStatus] = useState("idle"); // idle, saving, saved, error
   const inputRef = useRef(null);
   const autoSaveTimeoutRef = useRef(null);
@@ -74,27 +77,53 @@ const EnhancedFormField = ({
 
   // Validation
   const validateField = (val) => {
-    if (!val && !required) return true;
-    if (required && (!val || val.trim() === "")) return false;
-    if (minLength && val.length < minLength) return false;
-    if (maxLength && val.length > maxLength) return false;
-    if (pattern && !new RegExp(pattern).test(val)) return false;
-    return true;
+    if (!val && !required) return { isValid: true, message: "" };
+
+    if (required && (!val || (typeof val === 'string' && val.trim() === ""))) {
+      return { isValid: false, message: "This field is required" };
+    }
+
+    if (val && typeof val === 'string') {
+      if (minLength && val.length < minLength) {
+        return { isValid: false, message: `Must be at least ${minLength} characters` };
+      }
+
+      if (maxLength && val.length > maxLength) {
+        return { isValid: false, message: `Must be no more than ${maxLength} characters` };
+      }
+
+      if (pattern && !new RegExp(pattern).test(val)) {
+        return { isValid: false, message: "Invalid format" };
+      }
+
+      if (type === "email" && !EMAIL_REGEX.test(val)) {
+        return { isValid: false, message: "Please enter a valid email address" };
+      }
+
+      if (type === "url") {
+        try {
+          new URL(val);
+        } catch {
+          return { isValid: false, message: "Please enter a valid URL" };
+        }
+      }
+    }
+
+    return { isValid: true, message: "" };
   };
 
   const handleChange = (newValue) => {
     onChange(newValue);
     
-    if (validationMessage) {
-      setIsValidating(true);
-      setValidationState("validating");
-      
-      setTimeout(() => {
-        const isValid = validateField(newValue);
-        setValidationState(isValid ? "valid" : "invalid");
-        setIsValidating(false);
-      }, 300);
-    }
+    setIsValidating(true);
+    setValidationState("validating");
+
+    setTimeout(() => {
+      const result = validateField(newValue);
+      setValidationState(result.isValid ? "valid" : "invalid");
+      setInternalError(result.message);
+      setIsValidating(false);
+    }, 300);
   };
 
   const handleFocus = () => {
@@ -107,6 +136,14 @@ const EnhancedFormField = ({
   const handleBlur = () => {
     setIsFocused(false);
     setTimeout(() => setShowSuggestions(false), 200);
+
+    // Sanitize input
+    if (value && typeof value === 'string') {
+      const trimmed = value.trim();
+      if (trimmed !== value) {
+        onChange(trimmed);
+      }
+    }
   };
 
   const handleSuggestionClick = (suggestion) => {
@@ -329,10 +366,10 @@ const EnhancedFormField = ({
                 {error}
               </p>
             )}
-            {validationMessage && validationState === "invalid" && (
+            {(validationMessage || internalError) && validationState === "invalid" && (
               <p className="text-red-600 flex items-center gap-1">
                 <AlertCircle className="h-3 w-3" />
-                {validationMessage}
+                {validationMessage || internalError}
               </p>
             )}
           </div>
@@ -357,9 +394,9 @@ const EnhancedFormField = ({
               {error}
             </p>
           )}
-          {validationMessage && validationState === "invalid" && (
+          {(validationMessage || internalError) && validationState === "invalid" && (
             <p className="text-red-600 mt-1 text-xs">
-              {validationMessage}
+              {validationMessage || internalError}
             </p>
           )}
           {showCharacterCount && maxLength && (
