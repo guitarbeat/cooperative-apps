@@ -1,0 +1,3 @@
+## 2025-05-18 - Unstable Object References in useMemo
+**Learning:** Returning a new object literal from `useMemo` on every dependency change can break memoization of child components, even if the properties of that object are structurally the same. In `EmojiGridMapper`, `recommendations` map was created inside `useMemo`, causing the `recommended` array to be a new reference on every drag frame, forcing the entire word list (30+ components) to re-render unnecessarily.
+**Action:** Move static data mappings outside of hooks/components. Ensure object properties returned from hooks are stable references when possible, or split them into primitives if they drive expensive child renders.
