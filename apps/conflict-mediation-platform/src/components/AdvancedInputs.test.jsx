@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { render, screen, fireEvent, cleanup } from "@testing-library/react";
-import { MultiSelectInput } from "./AdvancedInputs";
+import { MultiSelectInput, StructuredListInput } from "./AdvancedInputs";
 
 afterEach(() => {
   cleanup();
@@ -139,5 +139,78 @@ describe("MultiSelectInput Accessibility", () => {
 
     // Verify focus returns to trigger (might fail if JSDOM doesn't handle focus perfectly, but worth trying)
     // expect(document.activeElement).toBe(trigger);
+  });
+});
+
+describe("StructuredListInput Accessibility", () => {
+  it("links label to input via id", () => {
+    render(
+      <StructuredListInput
+        id="test-list"
+        label="Test List"
+        value={[]}
+        onChange={() => {}}
+      />
+    );
+
+    const label = screen.getByText("Test List");
+    expect(label).toHaveAttribute("for", "test-list");
+
+    const input = screen.getByPlaceholderText("Enter item...");
+    expect(input).toHaveAttribute("id", "test-list");
+  });
+
+  it("provides accessible names for action buttons", () => {
+    const items = [
+      { id: 1, text: "Buy milk", completed: false },
+      { id: 2, text: "Walk dog", completed: true },
+    ];
+
+    render(
+      <StructuredListInput
+        id="test-list"
+        label="Test List"
+        value={items}
+        onChange={() => {}}
+      />
+    );
+
+    // Add button
+    expect(screen.getByLabelText("Add item")).toBeInTheDocument();
+
+    // Check buttons
+    expect(screen.getByLabelText("Mark Buy milk as complete")).toBeInTheDocument();
+    expect(screen.getByLabelText("Mark Walk dog as incomplete")).toBeInTheDocument();
+
+    // Edit buttons
+    expect(screen.getByLabelText("Edit Buy milk")).toBeInTheDocument();
+    expect(screen.getByLabelText("Edit Walk dog")).toBeInTheDocument();
+
+    // Delete buttons
+    expect(screen.getByLabelText("Delete Buy milk")).toBeInTheDocument();
+    expect(screen.getByLabelText("Delete Walk dog")).toBeInTheDocument();
+  });
+
+  it("provides accessible name for edit input", () => {
+    const items = [{ id: 1, text: "Buy milk", completed: false }];
+
+    // We need a real state update or just render the edit view by clicking
+    // Since we can't easily hook into internal state from outside without user interaction
+    // We will simulate the click on edit button
+
+    render(
+      <StructuredListInput
+        id="test-list"
+        label="Test List"
+        value={items}
+        onChange={() => {}}
+      />
+    );
+
+    fireEvent.click(screen.getByLabelText("Edit Buy milk"));
+
+    const editInput = screen.getByLabelText("Edit item");
+    expect(editInput).toBeInTheDocument();
+    expect(editInput).toHaveValue("Buy milk");
   });
 });

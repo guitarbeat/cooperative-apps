@@ -16,3 +16,7 @@
 ## 2026-02-15 - Missing Utility Classes
 **Learning:** `EnhancedFormField` relied on `animate-shake` which was missing from the CSS. Always verify utility classes exist, especially for animations, to avoid silent failures.
 **Action:** When adding utility classes for animations, verify they are defined in the design system or Tailwind config.
+
+## 2025-02-18 - List Item Actions Accessibility
+**Learning:** In a list of items (e.g., `StructuredListInput`), generic "Edit" or "Delete" buttons are confusing for screen reader users as they lack context.
+**Action:** Always include the item text in the `aria-label` for action buttons (e.g., `aria-label={\`Delete \${item.text}\`}`) to provide specific context.
