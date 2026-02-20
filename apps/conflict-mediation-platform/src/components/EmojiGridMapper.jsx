@@ -801,6 +801,14 @@ const EmojiGridMapper = ({
     }
   }, [containerSize, setPosition, onChartPositionChange, calculateEmotionData]);
 
+  // Optimize DraggableEmoji performance by memoizing the start handler
+  // to prevent unnecessary re-renders during parent updates.
+  // Using useCallback ensures referential stability.
+  const handleEmojiStart = useCallback((event) => {
+    handleStart(event);
+    handleMove(event);
+  }, [handleStart, handleMove]);
+
   return (
     <div
       className="space-y-4 sm:space-y-6"
@@ -847,10 +855,7 @@ const EmojiGridMapper = ({
                 containerSize={containerSize}
                 isDragging={isDragging}
                 emotionData={currentEmotionData}
-                onStart={(event) => {
-                  handleStart(event);
-                  handleMove(event);
-                }}
+                onStart={handleEmojiStart}
                 onKeyDown={handleKeyDown}
               />
             )}
