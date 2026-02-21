@@ -102,7 +102,10 @@ const EnhancedFormField = ({
 
       if (type === "url") {
         try {
-          new URL(val);
+          const url = new URL(val);
+          if (url.protocol !== "http:" && url.protocol !== "https:") {
+            return { isValid: false, message: "URL must start with http:// or https://" };
+          }
         } catch {
           return { isValid: false, message: "Please enter a valid URL" };
         }
