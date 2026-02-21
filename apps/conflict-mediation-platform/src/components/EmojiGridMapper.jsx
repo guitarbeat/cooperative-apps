@@ -585,10 +585,16 @@ const EmotionWordsSelector = React.memo(
                 {recommended.map((word) => (
                   <Badge
                     key={word}
+                    asChild
                     className={`cursor-pointer transition-all duration-300 hover:scale-105 ${getWordStyling(word)}`}
-                    onClick={() => toggleEmotionWord(word)}
                   >
-                    {word}
+                    <button
+                      type="button"
+                      onClick={() => toggleEmotionWord(word)}
+                      aria-pressed={selectedEmotionWords.includes(word)}
+                    >
+                      {word}
+                    </button>
                   </Badge>
                 ))}
               </div>
@@ -605,10 +611,16 @@ const EmotionWordsSelector = React.memo(
                   .map((word) => (
                     <Badge
                       key={word}
+                      asChild
                       className={`cursor-pointer transition-all duration-200 hover:scale-105 ${getWordStyling(word)}`}
-                      onClick={() => toggleEmotionWord(word)}
                     >
-                      {word}
+                      <button
+                        type="button"
+                        onClick={() => toggleEmotionWord(word)}
+                        aria-pressed={selectedEmotionWords.includes(word)}
+                      >
+                        {word}
+                      </button>
                     </Badge>
                   ))}
               </div>
