@@ -13,3 +13,7 @@ export function debounce(func, wait) {
     timeout = setTimeout(() => func.apply(context, args), wait);
   };
 }
+
+export function isDev() {
+  return import.meta.env.DEV;
+}
