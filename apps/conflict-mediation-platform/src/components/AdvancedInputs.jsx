@@ -421,6 +421,7 @@ export const StructuredListInput = ({
         <div className="flex gap-2">
           {itemType === "textarea" ? (
             <textarea
+              id={id}
               value={newItem}
               onChange={(e) => setNewItem(e.target.value)}
               onKeyDown={handleKeyDown}
@@ -430,6 +431,7 @@ export const StructuredListInput = ({
             />
           ) : (
             <input
+              id={id}
               type="text"
               value={newItem}
               onChange={(e) => setNewItem(e.target.value)}
@@ -463,7 +465,7 @@ export const StructuredListInput = ({
                 type="button"
                 onClick={() => handleToggleComplete(index)}
                 className="mt-1 text-muted-foreground hover:text-primary transition-colors"
-                aria-label={item.completed ? "Mark as incomplete" : "Mark as complete"}
+                aria-label={item.completed ? `Mark ${item.text} as incomplete` : `Mark ${item.text} as complete`}
               >
                 <Check className={cn("h-4 w-4", item.completed && "text-green-500")} />
               </button>
@@ -478,6 +480,7 @@ export const StructuredListInput = ({
                       rows={2}
                       className="form-input flex-1 resize-none"
                       autoFocus
+                      aria-label="Edit item"
                     />
                   ) : (
                     <input
@@ -487,6 +490,7 @@ export const StructuredListInput = ({
                       onKeyDown={handleKeyDown}
                       className="form-input flex-1"
                       autoFocus
+                      aria-label="Edit item"
                     />
                   )}
                   <button
@@ -518,6 +522,7 @@ export const StructuredListInput = ({
                       type="button"
                       onClick={() => handleEdit(index)}
                       className="p-1 text-muted-foreground hover:text-primary transition-colors"
+                      aria-label={`Edit ${item.text}`}
                     >
                       Edit
                     </button>
@@ -525,7 +530,7 @@ export const StructuredListInput = ({
                       type="button"
                       onClick={() => handleDelete(index)}
                       className="p-1 text-muted-foreground hover:text-red-500 transition-colors"
-                      aria-label="Delete item"
+                      aria-label={`Delete ${item.text}`}
                     >
                       <X className="h-3 w-3" />
                     </button>
