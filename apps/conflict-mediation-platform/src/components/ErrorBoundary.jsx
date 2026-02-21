@@ -2,6 +2,7 @@ import React from "react";
 import { AlertTriangle, RefreshCw, Home, Bug, Copy, Check } from "lucide-react";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
+import { isDev } from "../lib/utils";
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -68,8 +69,8 @@ class ErrorBoundary extends React.Component {
     const errorDetails = {
       errorId: this.state.errorId,
       message: this.state.error?.message,
-      stack: this.state.error?.stack,
-      componentStack: this.state.errorInfo?.componentStack,
+      stack: isDev() ? this.state.error?.stack : undefined,
+      componentStack: isDev() ? this.state.errorInfo?.componentStack : undefined,
       timestamp: new Date().toISOString(),
       retryCount: this.state.retryCount
     };
@@ -187,7 +188,7 @@ class ErrorBoundary extends React.Component {
             </div>
 
             {/* Debug Info (only in development) */}
-            {import.meta.env.DEV && error?.stack && (
+            {isDev() && error?.stack && (
               <details className="bg-muted/30 border border-border rounded-lg p-4">
                 <summary className="cursor-pointer font-medium text-sm mb-2 flex items-center gap-2">
                   <Bug className="h-4 w-4" />

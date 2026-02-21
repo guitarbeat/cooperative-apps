@@ -9,6 +9,7 @@ const ContactForm = () => {
     email: '',
     message: '',
   });
+  const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState(null); // 'success' | 'error' | null
   const successRef = useRef(null);
@@ -19,13 +20,63 @@ const ContactForm = () => {
     }
   }, [submitStatus]);
 
+  const validate = (data) => {
+    const newErrors = {};
+    if (!data.name.trim()) {
+      newErrors.name = 'Name is required';
+    } else if (data.name.trim().length < 2) {
+      newErrors.name = 'Name must be at least 2 characters';
+    }
+
+    if (!data.email.trim()) {
+      newErrors.email = 'Email is required';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
+      newErrors.email = 'Please enter a valid email address';
+    }
+
+    if (!data.message.trim()) {
+      newErrors.message = 'Message is required';
+    } else if (data.message.trim().length < 10) {
+      newErrors.message = 'Message must be at least 10 characters';
+    }
+
+    return newErrors;
+  };
+
   const handleChange = e => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+
+    // Clear error for the field being edited
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: null }));
+    }
+  };
+
+  const handleBlur = e => {
+    const { name, value } = e.target;
+    // Sanitize input on blur
+    setFormData(prev => ({ ...prev, [name]: value.trim() }));
   };
 
   const handleSubmit = async e => {
     e.preventDefault();
+
+    // Sanitize before validation
+    const sanitizedData = {
+      name: formData.name.trim(),
+      email: formData.email.trim(),
+      message: formData.message.trim()
+    };
+
+    setFormData(sanitizedData);
+
+    const validationErrors = validate(sanitizedData);
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+
     setIsSubmitting(true);
     setSubmitStatus(null);
 
@@ -33,9 +84,10 @@ const ContactForm = () => {
     try {
       await new Promise(resolve => setTimeout(resolve, 1500));
       // EmailJS integration will go here
-      console.log('Form submitted:', formData);
+      console.log('Form submitted:', sanitizedData);
       setSubmitStatus('success');
       setFormData({ name: '', email: '', message: '' });
+      setErrors({});
     } catch (error) {
       setSubmitStatus('error');
     } finally {
@@ -65,7 +117,7 @@ const ContactForm = () => {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-6" noValidate>
       <div className="flex flex-col gap-2">
         <label htmlFor="name" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
           Your Name <span className="text-red-500" aria-hidden="true">*</span>
@@ -77,9 +129,18 @@ const ContactForm = () => {
           placeholder="e.g. Jane Doe"
           value={formData.name}
           onChange={handleChange}
+          onBlur={handleBlur}
           required
           disabled={isSubmitting}
+          className={errors.name ? "border-red-500 focus-visible:ring-red-500" : ""}
+          aria-invalid={!!errors.name}
+          aria-describedby={errors.name ? "name-error" : undefined}
         />
+        {errors.name && (
+          <p id="name-error" className="text-sm text-red-500 mt-1" role="alert">
+            {errors.name}
+          </p>
+        )}
       </div>
 
       <div className="flex flex-col gap-2">
@@ -93,9 +154,18 @@ const ContactForm = () => {
           placeholder="e.g. jane@example.com"
           value={formData.email}
           onChange={handleChange}
+          onBlur={handleBlur}
           required
           disabled={isSubmitting}
+          className={errors.email ? "border-red-500 focus-visible:ring-red-500" : ""}
+          aria-invalid={!!errors.email}
+          aria-describedby={errors.email ? "email-error" : undefined}
         />
+        {errors.email && (
+          <p id="email-error" className="text-sm text-red-500 mt-1" role="alert">
+            {errors.email}
+          </p>
+        )}
       </div>
 
       <div className="flex flex-col gap-2">
@@ -108,10 +178,18 @@ const ContactForm = () => {
           placeholder="How can we help you?"
           value={formData.message}
           onChange={handleChange}
+          onBlur={handleBlur}
           required
           disabled={isSubmitting}
-          className="min-h-[120px]"
+          className={`min-h-[120px] ${errors.message ? "border-red-500 focus-visible:ring-red-500" : ""}`}
+          aria-invalid={!!errors.message}
+          aria-describedby={errors.message ? "message-error" : undefined}
         />
+        {errors.message && (
+          <p id="message-error" className="text-sm text-red-500 mt-1" role="alert">
+            {errors.message}
+          </p>
+        )}
       </div>
 
       <Button type="submit" isLoading={isSubmitting} className="w-full sm:w-auto">
