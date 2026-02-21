@@ -60,6 +60,13 @@ const ChartStyle = ({
     return null
   }
 
+  // Helper to prevent CSS injection
+  const sanitizeColor = (color) => {
+    if (typeof color !== 'string') return color;
+    // Remove potentially dangerous characters for CSS injection
+    return color.replace(/[;{}<]/g, '');
+  };
+
   return (
     <style
       dangerouslySetInnerHTML={{
@@ -71,7 +78,7 @@ ${colorConfig
 const color =
   itemConfig.theme?.[theme] ||
   itemConfig.color
-return color ? `  --color-${key}: ${color};` : null
+return color ? `  --color-${key}: ${sanitizeColor(color)};` : null
 })
 .join("\n")}
 }
