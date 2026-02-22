@@ -7,3 +7,8 @@
 **Vulnerability:** Input fields of type `url` allowed `javascript:` and other potentially dangerous protocols because `new URL()` validation only checks for valid URL syntax, not safe protocols.
 **Learning:** `new URL()` is not sufficient for security validation of user-provided URLs. It accepts `javascript:`, `data:`, `file:`, etc.
 **Prevention:** Explicitly validate `url.protocol` against an allowlist (e.g., `http:`, `https:`) when accepting URL inputs.
+
+## 2025-05-24 - Latent Vulnerability in Dead Code
+**Vulnerability:** An unused validation library (`InputValidation.jsx`) contained an insecure URL validator allowing `javascript:` protocol.
+**Learning:** Unused code (dead code) creates a false sense of security and can be a "time bomb" if later adopted by developers assuming it is safe.
+**Prevention:** Regularly audit codebase for unused files and remove them. If code must be kept, ensure it meets current security standards even if not currently active.

@@ -197,7 +197,10 @@ export const validationRules = {
     validate: (value) => {
       if (!value) return { isValid: true, message: "" };
       try {
-        new URL(value);
+        const url = new URL(value);
+        if (url.protocol !== "http:" && url.protocol !== "https:") {
+          return { isValid: false, message: "URL must start with http:// or https://" };
+        }
         return { isValid: true, message: "" };
       } catch {
         return { isValid: false, message };
