@@ -16,6 +16,23 @@ const ALL_RANDOM_COLORS = [
   "#059669", "#D97706", "#7C3AED", "#E11D48", "#0284C7", "#4F46E5", "#16A34A",
 ];
 
+const COLOR_LABELS = {
+  "#6B8E47": "Olive Green",
+  "#0D9488": "Teal",
+  "#2563EB": "Blue",
+  "#9333EA": "Purple",
+  "#EA580C": "Orange",
+  "#DB2777": "Pink",
+  "#0EA5E9": "Sky Blue",
+  "#059669": "Emerald",
+  "#D97706": "Amber",
+  "#7C3AED": "Violet",
+  "#E11D48": "Rose",
+  "#0284C7": "Light Blue",
+  "#4F46E5": "Indigo",
+  "#16A34A": "Green",
+};
+
 const PartySetupCard = ({
   partyKey,
   displayName,
@@ -177,9 +194,10 @@ const PartySetupCard = ({
                       boxShadow: isActive ? `0 0 12px ${c}50, 0 4px 8px rgba(0,0,0,0.15)` : undefined,
                     }}
                     onClick={() => onColorChange(c)}
-                    aria-label={`Use ${c} for ${displayName}`}
+                    aria-label={`Use ${COLOR_LABELS[c] || c} for ${displayName}`}
+                    title={COLOR_LABELS[c] || c}
                   >
-                    <span className="sr-only">Use {c} for {displayName}</span>
+                    <span className="sr-only">Use {COLOR_LABELS[c] || c} for {displayName}</span>
                   </motion.button>
                 );
               })}
