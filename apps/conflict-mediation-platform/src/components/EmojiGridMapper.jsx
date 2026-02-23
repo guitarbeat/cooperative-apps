@@ -6,6 +6,7 @@ import React, {
   useMemo,
 } from "react";
 import { Badge } from "./ui/badge";
+import useThrottle from "../hooks/useThrottle";
 
 // * Constants for emotion mapping and configuration
 const EMOTION_WORDS = [
@@ -733,6 +734,11 @@ const EmojiGridMapper = ({
     calculateEmotionData,
   ]);
 
+  // * Performance Optimization: Throttle emotion data for heavy UI updates
+  // DraggableEmoji needs 60fps updates, but the recommendations and text list don't.
+  // This prevents the heavy EmotionWordsSelector and its list from re-rendering every frame during drag.
+  const throttledEmotionData = useThrottle(currentEmotionData, 100);
+
   // Get emotion recommendations and colors for the main component
   const { quadrant: mainQuadrant, intensity: mainIntensity, colors: mainColors } = useEmotionRecommendation(
     currentEmotionData.valence,
@@ -962,7 +968,7 @@ const EmojiGridMapper = ({
         emotionWords={EMOTION_WORDS}
         selectedEmotionWords={selectedEmotionWords}
         onEmotionWordsChange={onEmotionWordsChange}
-        currentEmotionData={currentEmotionData}
+        currentEmotionData={throttledEmotionData}
         isEmojiPlaced={hasPlacedEmoji}
       />
     </div>

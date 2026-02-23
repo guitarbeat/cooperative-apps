@@ -1,0 +1,10 @@
+
+> conflict-mediation-platform@0.0.0 dev /app/apps/conflict-mediation-platform
+> vite
+
+
+  VITE v6.4.1  ready in 453 ms
+
+  ➜  Local:   http://localhost:8080/
+  ➜  Network: http://192.168.0.2:8080/
+9:00:50 PM [vite] (client) page reload src/components/EmojiGridMapper.test.jsx
