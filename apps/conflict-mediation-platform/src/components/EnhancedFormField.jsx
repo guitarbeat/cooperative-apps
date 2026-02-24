@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { Check, X, AlertCircle, HelpCircle, Eye, EyeOff, Lightbulb } from "lucide-react";
 import { cn } from "../lib/utils";
 import { SmartSuggestions, ContextualHelp } from "./SmartSuggestions";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -212,30 +213,60 @@ const EnhancedFormField = ({
 
   const renderValidationIcon = () => {
     if (isValidating) {
-      return <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full" />;
+      return (
+        <div role="status" className="flex items-center justify-center">
+          <span className="sr-only">Validating...</span>
+          <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full" />
+        </div>
+      );
     }
-    
+
     if (validationState === "valid") {
-      return <Check className="h-4 w-4 text-green-500" />;
+      return (
+        <div role="status" className="flex items-center justify-center">
+          <span className="sr-only">Valid</span>
+          <Check className="h-4 w-4 text-green-500" />
+        </div>
+      );
     }
-    
+
     if (validationState === "invalid") {
-      return <X className="h-4 w-4 text-red-500" />;
+      return (
+        <div role="status" className="flex items-center justify-center">
+          <span className="sr-only">Invalid</span>
+          <X className="h-4 w-4 text-red-500" />
+        </div>
+      );
     }
-    
+
     return null;
   };
 
   const renderAutoSaveStatus = () => {
     if (!autoSave) return null;
-    
+
     switch (autoSaveStatus) {
       case "saving":
-        return <div className="animate-spin h-3 w-3 border border-primary border-t-transparent rounded-full" />;
+        return (
+          <div role="status" className="flex items-center justify-center">
+            <span className="sr-only">Saving...</span>
+            <div className="animate-spin h-3 w-3 border border-primary border-t-transparent rounded-full" />
+          </div>
+        );
       case "saved":
-        return <Check className="h-3 w-3 text-green-500" />;
+        return (
+          <div role="status" className="flex items-center justify-center">
+            <span className="sr-only">Saved</span>
+            <Check className="h-3 w-3 text-green-500" />
+          </div>
+        );
       case "error":
-        return <X className="h-3 w-3 text-red-500" />;
+        return (
+          <div role="status" className="flex items-center justify-center">
+            <span className="sr-only">Error saving</span>
+            <X className="h-3 w-3 text-red-500" />
+          </div>
+        );
       default:
         return null;
     }
@@ -267,22 +298,36 @@ const EnhancedFormField = ({
             {renderValidationIcon()}
             {renderAutoSaveStatus()}
             {helpText && (
-              <button
-                type="button"
-                className="text-muted-foreground hover:text-foreground transition-colors"
-                title={helpText}
-              >
-                <HelpCircle className="h-4 w-4" />
-              </button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    type="button"
+                    className="text-muted-foreground hover:text-foreground transition-colors"
+                    aria-label="Help information"
+                  >
+                    <HelpCircle className="h-4 w-4" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{helpText}</p>
+                </TooltipContent>
+              </Tooltip>
             )}
             {smartSuggestions && (
-              <button
-                type="button"
-                className="text-muted-foreground hover:text-foreground transition-colors"
-                title="Smart suggestions available"
-              >
-                <Lightbulb className="h-4 w-4" />
-              </button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    type="button"
+                    className="text-muted-foreground hover:text-foreground transition-colors"
+                    aria-label="Smart suggestions available"
+                  >
+                    <Lightbulb className="h-4 w-4" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Smart suggestions available</p>
+                </TooltipContent>
+              </Tooltip>
             )}
           </div>
         </div>
