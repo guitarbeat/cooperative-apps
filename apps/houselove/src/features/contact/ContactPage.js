@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Input } from '../../shared/ui/input';
 import { Textarea } from '../../shared/ui/textarea';
 import { Button } from '../../shared/ui/button';
+import { sanitizeInput } from '../../lib/validation';
 
 const ContactForm = () => {
   const [formData, setFormData] = useState({
@@ -64,12 +65,10 @@ const ContactForm = () => {
 
     // Sanitize before validation
     const sanitizedData = {
-      name: formData.name.trim(),
-      email: formData.email.trim(),
-      message: formData.message.trim()
+      name: sanitizeInput(formData.name.trim()),
+      email: sanitizeInput(formData.email.trim()),
+      message: sanitizeInput(formData.message.trim())
     };
-
-    setFormData(sanitizedData);
 
     const validationErrors = validate(sanitizedData);
     if (Object.keys(validationErrors).length > 0) {
