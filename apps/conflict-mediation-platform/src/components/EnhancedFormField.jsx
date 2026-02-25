@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { Check, X, AlertCircle, HelpCircle, Eye, EyeOff, Lightbulb } from "lucide-react";
 import { cn } from "../lib/utils";
 import { SmartSuggestions, ContextualHelp } from "./SmartSuggestions";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -244,13 +245,31 @@ const EnhancedFormField = ({
   const renderAutoSaveStatus = () => {
     if (!autoSave) return null;
     
+    // Common wrapper for layout
+    const wrapperClass = "flex items-center gap-1.5";
+
     switch (autoSaveStatus) {
       case "saving":
-        return <div className="animate-spin h-3 w-3 border border-primary border-t-transparent rounded-full" />;
+        return (
+          <div className={wrapperClass} role="status" aria-live="polite">
+            <div className="animate-spin h-3 w-3 border border-primary border-t-transparent rounded-full" aria-hidden="true" />
+            <span className="sr-only">Saving changes...</span>
+          </div>
+        );
       case "saved":
-        return <Check className="h-3 w-3 text-green-500" />;
+        return (
+          <div className={wrapperClass} role="status" aria-live="polite">
+            <Check className="h-3 w-3 text-green-500" aria-hidden="true" />
+            <span className="sr-only">Changes saved</span>
+          </div>
+        );
       case "error":
-        return <X className="h-3 w-3 text-red-500" />;
+        return (
+          <div className={wrapperClass} role="status" aria-live="polite">
+            <X className="h-3 w-3 text-red-500" aria-hidden="true" />
+            <span className="sr-only">Error saving changes</span>
+          </div>
+        );
       default:
         return null;
     }
@@ -282,22 +301,36 @@ const EnhancedFormField = ({
             {renderValidationIcon()}
             {renderAutoSaveStatus()}
             {helpText && (
-              <button
-                type="button"
-                className="text-muted-foreground hover:text-foreground transition-colors"
-                title={helpText}
-              >
-                <HelpCircle className="h-4 w-4" />
-              </button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    type="button"
+                    className="text-muted-foreground hover:text-foreground transition-colors"
+                    aria-label="Show help text"
+                  >
+                    <HelpCircle className="h-4 w-4" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{helpText}</p>
+                </TooltipContent>
+              </Tooltip>
             )}
             {smartSuggestions && (
-              <button
-                type="button"
-                className="text-muted-foreground hover:text-foreground transition-colors"
-                title="Smart suggestions available"
-              >
-                <Lightbulb className="h-4 w-4" />
-              </button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    type="button"
+                    className="text-muted-foreground hover:text-foreground transition-colors"
+                    aria-label="Smart suggestions available"
+                  >
+                    <Lightbulb className="h-4 w-4" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Smart suggestions available</p>
+                </TooltipContent>
+              </Tooltip>
             )}
           </div>
         </div>
