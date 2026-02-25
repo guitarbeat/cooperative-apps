@@ -50,6 +50,16 @@ const EnhancedFormField = ({
   const [autoSaveStatus, setAutoSaveStatus] = useState("idle"); // idle, saving, saved, error
   const inputRef = useRef(null);
   const autoSaveTimeoutRef = useRef(null);
+  const validationTimeoutRef = useRef(null);
+
+  // Clear validation timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (validationTimeoutRef.current) {
+        clearTimeout(validationTimeoutRef.current);
+      }
+    };
+  }, []);
 
   // Auto-save functionality
   useEffect(() => {
@@ -121,11 +131,16 @@ const EnhancedFormField = ({
     setIsValidating(true);
     setValidationState("validating");
 
-    setTimeout(() => {
+    if (validationTimeoutRef.current) {
+      clearTimeout(validationTimeoutRef.current);
+    }
+
+    validationTimeoutRef.current = setTimeout(() => {
       const result = validateField(newValue);
       setValidationState(result.isValid ? "valid" : "invalid");
       setInternalError(result.message);
       setIsValidating(false);
+      validationTimeoutRef.current = null;
     }, 300);
   };
 
