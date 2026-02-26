@@ -454,8 +454,8 @@ const DraggableEmoji = React.memo(
     return (
       <div
         ref={emojiRef}
-        className={`absolute w-12 h-12 flex items-center justify-center text-2xl rounded-full backdrop-blur-md border-2 transition-all duration-300 ${
-          isDragging ? 'shadow-2xl animate-pulse' : 'shadow-lg'
+        className={`absolute w-12 h-12 flex items-center justify-center text-2xl rounded-full backdrop-blur-md border-2 ${
+          isDragging ? 'shadow-2xl animate-pulse' : 'shadow-lg transition-all duration-300'
         }`}
         style={{
           left: `${(position.x / containerSize) * 100}%`,
