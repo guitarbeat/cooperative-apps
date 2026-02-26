@@ -6,6 +6,7 @@ import FormField from "./FormField";
 import EnhancedFormField from "./EnhancedFormField";
 import AvatarEmojiPicker from "./AvatarEmojiPicker";
 import { Button } from "./ui/button";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 const RECOMMENDED_PARTY_COLORS = [
   "#6B8E47", "#0D9488", "#2563EB", "#9333EA", "#EA580C", "#DB2777", "#0EA5E9",
@@ -159,17 +160,24 @@ const PartySetupCard = ({
                   inputClassName="party-color-input h-10"
                 />
               </div>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={handleRandomColor}
-                className="h-10 shrink-0 gap-1.5"
-                aria-label={`Randomize color for ${displayName}`}
-              >
-                <Dices className="h-4 w-4" />
-                <span className="text-xs hidden sm:inline">Random</span>
-              </Button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={handleRandomColor}
+                    className="h-10 shrink-0 gap-1.5"
+                    aria-label={`Randomize color for ${displayName}`}
+                  >
+                    <Dices className="h-4 w-4" />
+                    <span className="text-xs hidden sm:inline">Random</span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Randomize color</p>
+                </TooltipContent>
+              </Tooltip>
             </div>
             <div className="flex flex-wrap items-center gap-2">
               {RECOMMENDED_PARTY_COLORS.map((c) => {
