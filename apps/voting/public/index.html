@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Real-time Voting Application</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .panel {
+      border: 1px solid #ccc;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 5px;
+    }
+    .hidden {
+      display: none;
+    }
+    button {
+      padding: 10px 15px;
+      margin: 5px 0;
+      cursor: pointer;
+    }
+    input[type="text"] {
+      padding: 8px;
+      width: 80%;
+      margin-bottom: 10px;
+    }
+    .option-btn {
+      display: block;
+      width: 100%;
+      text-align: left;
+    }
+    .results {
+      margin-top: 20px;
+    }
+    .result-item {
+      margin-bottom: 10px;
+    }
+    .bar {
+      height: 20px;
+      background-color: #4CAF50;
+      color: white;
+      text-align: right;
+      padding-right: 5px;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Real-time Voting</h1>
+
+    <div class="panel">
+      <h2>Role Selection</h2>
+      <p>Select your role to participate:</p>
+      <button onclick="setRole('host')">I am the Host</button>
+      <button onclick="setRole('voter')">I am a Voter</button>
+    </div>
+
+    <div id="hostPanel" class="panel hidden">
+      <h2>Host Controls</h2>
+      <div id="createPollSection">
+        <h3>Create a new Poll</h3>
+        <input type="text" id="pollQuestion" placeholder="Enter poll question..." value="What is your favorite color?">
+        <div>
+          <p>Options:</p>
+          <ul id="optionsList">
+            <li>Option 1: Red</li>
+            <li>Option 2: Blue</li>
+            <li>Option 3: Green</li>
+          </ul>
+        </div>
+        <button onclick="startPoll()">Start Poll</button>
+      </div>
+
+      <div id="activePollHostSection" class="hidden">
+        <h3>Active Poll Results</h3>
+        <h4 id="hostPollQuestion"></h4>
+        <div id="hostPollResults" class="results"></div>
+        <button onclick="stopPoll()">Stop Poll</button>
+      </div>
+    </div>
+
+    <div id="voterPanel" class="panel hidden">
+      <h2>Voter Panel</h2>
+
+      <div id="waitingForPoll">
+        <p>Waiting for the host to start a poll...</p>
+      </div>
+
+      <div id="activePollVoterSection" class="hidden">
+        <h3 id="voterPollQuestion"></h3>
+        <div id="voterOptions"></div>
+        <div id="voterVoteMessage" style="color: green; margin-top: 10px;" class="hidden">Vote submitted successfully!</div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    let currentRole = null;
+    let hasVoted = false;
+
+    // Default poll options for demo
+    const defaultOptions = [
+      { id: 'opt1', text: 'Red' },
+      { id: 'opt2', text: 'Blue' },
+      { id: 'opt3', text: 'Green' }
+    ];
+
+    function setRole(role) {
+      currentRole = role;
+      document.querySelector('.panel').classList.add('hidden'); // hide role selection
+
+      if (role === 'host') {
+        document.getElementById('hostPanel').classList.remove('hidden');
+      } else {
+        document.getElementById('voterPanel').classList.remove('hidden');
+      }
+    }
+
+    function startPoll() {
+      const question = document.getElementById('pollQuestion').value;
+      const pollData = {
+        question: question,
+        options: defaultOptions
+      };
+
+      socket.emit('host:start_poll', pollData);
+
+      document.getElementById('createPollSection').classList.add('hidden');
+      document.getElementById('activePollHostSection').classList.remove('hidden');
+      document.getElementById('hostPollQuestion').innerText = question;
+    }
+
+    function stopPoll() {
+      socket.emit('host:stop_poll');
+
+      document.getElementById('createPollSection').classList.remove('hidden');
+      document.getElementById('activePollHostSection').classList.add('hidden');
+    }
+
+    function submitVote(optionId) {
+      if (!hasVoted) {
+        socket.emit('voter:vote', optionId);
+        hasVoted = true;
+
+        // Disable buttons
+        const buttons = document.querySelectorAll('.option-btn');
+        buttons.forEach(btn => btn.disabled = true);
+
+        document.getElementById('voterVoteMessage').classList.remove('hidden');
+      }
+    }
+
+    // Socket listeners
+    socket.on('poll:update', (data) => {
+      const { poll, votes } = data;
+
+      if (!poll) {
+        // Poll stopped
+        if (currentRole === 'host') {
+          document.getElementById('createPollSection').classList.remove('hidden');
+          document.getElementById('activePollHostSection').classList.add('hidden');
+        } else if (currentRole === 'voter') {
+          document.getElementById('waitingForPoll').classList.remove('hidden');
+          document.getElementById('activePollVoterSection').classList.add('hidden');
+          hasVoted = false;
+          document.getElementById('voterVoteMessage').classList.add('hidden');
+        }
+        return;
+      }
+
+      // Poll is active
+      if (currentRole === 'host') {
+        document.getElementById('createPollSection').classList.add('hidden');
+        document.getElementById('activePollHostSection').classList.remove('hidden');
+        document.getElementById('hostPollQuestion').innerText = poll.question;
+
+        // Update results
+        const resultsContainer = document.getElementById('hostPollResults');
+        resultsContainer.innerHTML = '';
+
+        let totalVotes = 0;
+        for (const id in votes) {
+          totalVotes += votes[id];
+        }
+
+        poll.options.forEach(option => {
+          const voteCount = votes[option.id] || 0;
+          const percentage = totalVotes === 0 ? 0 : Math.round((voteCount / totalVotes) * 100);
+
+          const div = document.createElement('div');
+          div.className = 'result-item';
+          div.innerHTML = `
+            <div>${option.text}: ${voteCount} votes (${percentage}%)</div>
+            <div class="bar" style="width: ${percentage > 0 ? percentage : 1}%">${percentage}%</div>
+          `;
+          resultsContainer.appendChild(div);
+        });
+
+      } else if (currentRole === 'voter') {
+        document.getElementById('waitingForPoll').classList.add('hidden');
+        document.getElementById('activePollVoterSection').classList.remove('hidden');
+        document.getElementById('voterPollQuestion').innerText = poll.question;
+
+        // Only update buttons if haven't voted for this new poll
+        if (!hasVoted) {
+          const optionsContainer = document.getElementById('voterOptions');
+          optionsContainer.innerHTML = '';
+
+          poll.options.forEach(option => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = option.text;
+            btn.onclick = () => submitVote(option.id);
+            optionsContainer.appendChild(btn);
+          });
+        }
+      }
+    });
+  </script>
+</body>
+</html>
