@@ -503,6 +503,18 @@ function initPolicyWizard() {
         });
     });
     
+
+    // Helper to sanitize HTML to prevent XSS
+    function escapeHTML(str) {
+        if (!str) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
     // Generate policy based on form inputs
     function generatePolicy(policyType) {
         const selectedPolicy = policyTypes[policyType];
@@ -521,9 +533,9 @@ function initPolicyWizard() {
         
         if (policyType === 'conflict') {
             // Get form values
-            const processValue = getRadioValue('conflict-process');
+            const processValue = escapeHTML(getRadioValue('conflict-process'));
             const mediators = getCheckboxValues('conflict-mediators');
-            const timeline = document.getElementById('conflict-timeline').value;
+            const timeline = escapeHTML(document.getElementById('conflict-timeline').value);
             
             policyHTML += `
                 <h2 class="text-xl font-semibold mb-2">Conflict Resolution Process</h2>
@@ -532,7 +544,7 @@ function initPolicyWizard() {
                 <h2 class="text-xl font-semibold mb-2">Mediators</h2>
                 <p class="mb-4">The following individuals may serve as mediators:</p>
                 <ul class="list-disc pl-5 mb-4">
-                    ${mediators.map(m => `<li>${m}</li>`).join('') || '<li>To be determined by the board</li>'}
+                    ${mediators.map(m => `<li>${escapeHTML(m)}</li>`).join('') || '<li>To be determined by the board</li>'}
                 </ul>
                 
                 <h2 class="text-xl font-semibold mb-2">Timeline</h2>
@@ -541,13 +553,13 @@ function initPolicyWizard() {
         } else if (policyType === 'communication') {
             // Get form values
             const channels = getCheckboxValues('comm-channels');
-            const frequency = getRadioValue('comm-frequency');
+            const frequency = escapeHTML(getRadioValue('comm-frequency'));
             
             policyHTML += `
                 <h2 class="text-xl font-semibold mb-2">Communication Channels</h2>
                 <p class="mb-4">The cooperative will use the following communication channels:</p>
                 <ul class="list-disc pl-5 mb-4">
-                    ${channels.map(c => `<li>${c}</li>`).join('') || '<li>To be determined by the board</li>'}
+                    ${channels.map(c => `<li>${escapeHTML(c)}</li>`).join('') || '<li>To be determined by the board</li>'}
                 </ul>
                 
                 <h2 class="text-xl font-semibold mb-2">Communication Frequency</h2>
