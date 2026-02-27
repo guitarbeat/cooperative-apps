@@ -18,6 +18,13 @@ const TOTAL_SURVEY_STEPS =
     .flatMap((category) => category.steps)
     .reduce((highest, step) => Math.max(highest, step), 0) || 1;
 
+/**
+ * Returns the number of sub-steps for a given main step.
+ * Currently, steps 2 and 3 (Individual Reflection) have 3 sub-steps each.
+ * 
+ * @param {number} step - The main step number.
+ * @returns {number} The number of sub-steps.
+ */
 const getSubStepCountForStep = (step) => {
   if (step === 2 || step === 3) {
     return 3;
@@ -45,6 +52,13 @@ const FIELD_LABELS = {
   followUpDate: "Follow-up Date",
 };
 
+/**
+ * Main Application Component for the Conflict Resolution Platform.
+ * Manages the global state for the 7-step mediation process, including
+ * form data, navigation, and theme.
+ * 
+ * @returns {JSX.Element} The rendered application.
+ */
 function App() {
   // Form data management
   const {

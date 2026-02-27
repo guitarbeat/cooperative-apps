@@ -8,7 +8,12 @@
   "scripts": {
     "houselove:start": "pnpm --filter house-love start",
     "houselove:build": "pnpm --filter house-love build",
+    "houselove:test": "pnpm --filter house-love test",
     "conflict:dev": "pnpm --filter conflict-mediation-platform dev",
-    "conflict:build": "pnpm --filter conflict-mediation-platform build"
+    "conflict:build": "pnpm --filter conflict-mediation-platform build",
+    "conflict:test": "pnpm --filter conflict-mediation-platform test",
+    "install:all": "pnpm install",
+    "test:all": "pnpm -r test",
+    "build:all": "pnpm -r build"
   }
 }

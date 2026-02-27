@@ -15,6 +15,12 @@ const Mediators = React.lazy(loadMediators);
 const Resources = React.lazy(loadResources);
 const Contact = React.lazy(loadContact);
 
+/**
+ * Main Application Component for House Love.
+ * Sets up the theme provider, router, and main layout with lazy-loaded routes.
+ * 
+ * @returns {JSX.Element} The rendered application.
+ */
 function App() {
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
