@@ -190,6 +190,7 @@ const EnhancedFormField = ({
       isFocused && "ring-2 ring-primary/20",
       disabled && "opacity-50 cursor-not-allowed",
       readOnly && "bg-muted cursor-default",
+      type === "password" && "pr-10",
       className
     ),
     placeholder,
@@ -363,14 +364,21 @@ const EnhancedFormField = ({
         {renderInput()}
         
         {type === "password" && (
-          <button
-            type="button"
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-            onClick={() => setShowPassword(!showPassword)}
-            aria-label={showPassword ? "Hide password" : "Show password"}
-          >
-            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-          </button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{showPassword ? "Hide password" : "Show password"}</p>
+            </TooltipContent>
+          </Tooltip>
         )}
 
         {showSuggestions && suggestions.length > 0 && (
