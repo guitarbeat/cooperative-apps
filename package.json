@@ -12,6 +12,8 @@
     "conflict:dev": "pnpm --filter conflict-mediation-platform dev",
     "conflict:build": "pnpm --filter conflict-mediation-platform build",
     "conflict:test": "pnpm --filter conflict-mediation-platform test",
+    "voting:start": "pnpm --filter voting start",
+    "voting:dev": "pnpm --filter voting dev",
     "install:all": "pnpm install",
     "test:all": "pnpm -r test",
     "build:all": "pnpm -r build"
