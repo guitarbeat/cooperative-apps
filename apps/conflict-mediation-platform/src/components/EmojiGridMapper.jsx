@@ -419,13 +419,14 @@ const useDragHandler = (containerRef, containerSize, onChartPositionChange) => {
  * @param {string} props.emotionData.emoji - Current emoji
  * @param {string} props.emotionData.label - Current emotion label
  * @param {number} props.emotionData.scaleFactor - Scale factor for the emoji
+ * @param {Object} props.colors - Color scheme for the current emotion
  * @param {function} props.onStart - Callback when drag starts
  * @param {function} props.onKeyDown - Callback for keyboard navigation
  */
 const DraggableEmoji = React.memo(
-  ({ position, containerSize, isDragging, emotionData, onStart, onKeyDown }) => {
+  ({ position, isDragging, emotionData, colors, onStart, onKeyDown }) => {
     const emojiRef = useRef(null);
-    const { colors } = useEmotionRecommendation(emotionData.valence, emotionData.arousal);
+    // Removed duplicate useEmotionRecommendation call to improve performance
 
     useEffect(() => {
       const emojiElement = emojiRef.current;
@@ -458,11 +459,13 @@ const DraggableEmoji = React.memo(
           isDragging ? 'shadow-2xl animate-pulse' : 'shadow-lg transition-all duration-300'
         }`}
         style={{
-          left: `${(position.x / containerSize) * 100}%`,
-          top: `${(position.y / containerSize) * 100}%`,
-          transform: `translate(-50%, -50%) scale(${
+          // Optimization: Use transform for positioning to prevent layout thrashing (reflow)
+          // instead of left/top which trigger layout recalculation
+          transform: `translate3d(${position.x}px, ${position.y}px, 0) translate(-50%, -50%) scale(${
             emotionData.scaleFactor * (isDragging ? 1.1 : 1)
           })`,
+          left: 0,
+          top: 0,
           background: `linear-gradient(135deg, ${colors.gradientColors}, rgba(255,255,255,0.1))`,
           borderColor: colors.borderColor,
           boxShadow: isDragging 
@@ -884,6 +887,7 @@ const EmojiGridMapper = ({
                 containerSize={containerSize}
                 isDragging={isDragging}
                 emotionData={currentEmotionData}
+                colors={mainColors}
                 onStart={handleEmojiStart}
                 onKeyDown={handleKeyDown}
               />
