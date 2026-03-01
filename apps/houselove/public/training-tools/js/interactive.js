@@ -1,6 +1,17 @@
 // Cooperative Housing Culture & Conflict Resolution Training
 // Interactive Components JavaScript
 
+// Helper function to escape HTML to prevent XSS
+function escapeHTML(str) {
+    if (!str) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize all interactive components
     initConflictFlowchart();
@@ -527,16 +538,16 @@ function initPolicyWizard() {
             
             policyHTML += `
                 <h2 class="text-xl font-semibold mb-2">Conflict Resolution Process</h2>
-                <p class="mb-4">${processValue || 'The cooperative will use a structured process for resolving conflicts.'}</p>
+                <p class="mb-4">${escapeHTML(processValue) || 'The cooperative will use a structured process for resolving conflicts.'}</p>
                 
                 <h2 class="text-xl font-semibold mb-2">Mediators</h2>
                 <p class="mb-4">The following individuals may serve as mediators:</p>
                 <ul class="list-disc pl-5 mb-4">
-                    ${mediators.map(m => `<li>${m}</li>`).join('') || '<li>To be determined by the board</li>'}
+                    ${mediators.map(m => `<li>${escapeHTML(m)}</li>`).join('') || '<li>To be determined by the board</li>'}
                 </ul>
                 
                 <h2 class="text-xl font-semibold mb-2">Timeline</h2>
-                <p class="mb-4">${timeline || 'Timeline will be established on a case-by-case basis.'}</p>
+                <p class="mb-4">${escapeHTML(timeline) || 'Timeline will be established on a case-by-case basis.'}</p>
             `;
         } else if (policyType === 'communication') {
             // Get form values
@@ -547,11 +558,11 @@ function initPolicyWizard() {
                 <h2 class="text-xl font-semibold mb-2">Communication Channels</h2>
                 <p class="mb-4">The cooperative will use the following communication channels:</p>
                 <ul class="list-disc pl-5 mb-4">
-                    ${channels.map(c => `<li>${c}</li>`).join('') || '<li>To be determined by the board</li>'}
+                    ${channels.map(c => `<li>${escapeHTML(c)}</li>`).join('') || '<li>To be determined by the board</li>'}
                 </ul>
                 
                 <h2 class="text-xl font-semibold mb-2">Communication Frequency</h2>
-                <p class="mb-4">${frequency || 'Communication frequency will be determined based on cooperative needs.'}</p>
+                <p class="mb-4">${escapeHTML(frequency) || 'Communication frequency will be determined based on cooperative needs.'}</p>
             `;
         }
         
