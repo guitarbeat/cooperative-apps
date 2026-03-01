@@ -856,13 +856,13 @@ const EmojiGridMapper = ({
         <div className="overflow-x-auto pb-4">
           <div
             ref={containerRef}
-            className={`relative w-[300px] h-[300px] sm:w-[400px] sm:h-[400px] lg:w-[500px] lg:h-[500px] mx-auto rounded-full flex-shrink-0 backdrop-blur-xl border-2 shadow-2xl transition-all duration-500 ${
-              hasPlacedEmoji ? "" : "ring-4 ring-offset-4 ring-orange-200"
+            className={`relative w-full max-w-[300px] aspect-square sm:w-[400px] sm:h-[400px] lg:w-[500px] lg:h-[500px] mx-auto rounded-full flex-shrink-0 backdrop-blur-xl border-2 shadow-2xl transition-all duration-500 ${
+              hasPlacedEmoji ? "" : "ring-4 ring-offset-4 ring-primary/30"
             }`}
             style={{
               userSelect: "none",
               background: `linear-gradient(135deg, ${mainColors.gradientColors}, rgba(255,255,255,0.05))`,
-              borderColor: hasPlacedEmoji ? mainColors.borderColor : "rgba(251, 191, 36, 0.7)",
+              borderColor: hasPlacedEmoji ? mainColors.borderColor : "var(--ring)",
               boxShadow: `0 8px 32px 0 ${mainColors.shadowColor}, inset 0 1px 0 rgba(255,255,255,0.2)`,
               cursor: hasPlacedEmoji ? "pointer" : "grab",
               borderStyle: hasPlacedEmoji ? "solid" : "dashed",
@@ -875,7 +875,7 @@ const EmojiGridMapper = ({
             <div className="absolute left-1/2 top-0 bottom-0 w-px bg-gray-300 opacity-30"></div>
 
             {!hasPlacedEmoji && (
-              <div className="absolute inset-10 rounded-full border-2 border-dashed border-orange-200 flex flex-col items-center justify-center text-center gap-2 text-sm text-orange-500">
+              <div className="absolute inset-10 rounded-full border-2 border-dashed border-primary/30 flex flex-col items-center justify-center text-center gap-2 text-sm text-primary">
                 <span className="text-3xl">{EMOTION_QUADRANTS.neutral.emoji}</span>
                 <span>Drop the emoji here to start mapping your feelings</span>
               </div>
@@ -902,7 +902,7 @@ const EmojiGridMapper = ({
             </div>
             <div className="relative flex flex-col items-center gap-2">
               <button
-                className="relative w-14 h-14 flex items-center justify-center text-3xl rounded-full bg-white border-2 border-orange-200 shadow-lg hover:shadow-xl transition-all duration-200"
+                className="relative w-14 h-14 flex items-center justify-center text-3xl rounded-full bg-white border-2 border-primary/30 shadow-lg hover:shadow-xl transition-all duration-200"
                 onMouseDown={startInitialDrag}
                 onTouchStart={startInitialDrag}
                 onClick={handleStartClick}
@@ -910,7 +910,7 @@ const EmojiGridMapper = ({
               >
                 {EMOTION_QUADRANTS.neutral.emoji}
               </button>
-              <span className="text-xs uppercase tracking-wide text-orange-500 font-semibold">
+              <span className="text-xs uppercase tracking-wide text-primary font-semibold">
                 Drag me into the map
               </span>
             </div>
@@ -919,7 +919,7 @@ const EmojiGridMapper = ({
 
         {initialDragPosition && (
           <div
-            className="pointer-events-none fixed z-50 w-14 h-14 flex items-center justify-center text-3xl rounded-full bg-white border-2 border-orange-200 shadow-2xl"
+            className="pointer-events-none fixed z-50 w-14 h-14 flex items-center justify-center text-3xl rounded-full bg-white border-2 border-primary/30 shadow-2xl"
             style={{
               left: `${initialDragPosition.x}px`,
               top: `${initialDragPosition.y}px`,
