@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { sanitizeInput } from '../../lib/validation';
 import { Input } from '../../shared/ui/input';
 import { Textarea } from '../../shared/ui/textarea';
 import { Button } from '../../shared/ui/button';
@@ -63,19 +64,26 @@ const ContactForm = () => {
     e.preventDefault();
 
     // Sanitize before validation
-    const sanitizedData = {
+    const trimmedData = {
       name: formData.name.trim(),
       email: formData.email.trim(),
       message: formData.message.trim()
     };
 
-    setFormData(sanitizedData);
+    setFormData(trimmedData);
 
-    const validationErrors = validate(sanitizedData);
+    const validationErrors = validate(trimmedData);
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return;
     }
+
+    // Sanitize for submission (XSS prevention)
+    const submissionData = {
+      name: sanitizeInput(trimmedData.name),
+      email: sanitizeInput(trimmedData.email),
+      message: sanitizeInput(trimmedData.message)
+    };
 
     setIsSubmitting(true);
     setSubmitStatus(null);
@@ -84,7 +92,7 @@ const ContactForm = () => {
     try {
       await new Promise(resolve => setTimeout(resolve, 1500));
       // EmailJS integration will go here
-      console.log('Form submitted:', sanitizedData);
+      console.log('Form submitted:', submissionData);
       setSubmitStatus('success');
       setFormData({ name: '', email: '', message: '' });
       setErrors({});
