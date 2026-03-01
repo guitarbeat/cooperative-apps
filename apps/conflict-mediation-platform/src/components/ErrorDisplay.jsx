@@ -103,7 +103,7 @@ const ErrorDisplay = ({
             className="text-muted-foreground hover:text-foreground transition-colors"
             aria-label="Dismiss error"
           >
-            <XCircle className="h-4 w-4" />
+            <XCircle className="h-4 w-4" aria-hidden="true" />
           </button>
         )}
       </div>
@@ -153,7 +153,7 @@ const ErrorDisplay = ({
               className="h-8 px-2 text-xs"
               aria-label="Dismiss error"
             >
-              <XCircle className="h-3 w-3" />
+              <XCircle className="h-3 w-3" aria-hidden="true" />
             </Button>
           )}
         </div>
