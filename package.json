@@ -1,11 +1,14 @@
 {
   "name": "cooperative-apps",
   "private": true,
-  "description": "Cooperative community tools: House Love platform and Conflict Mediation Platform",
+  "description": "Cooperative community tools monorepo",
   "workspaces": [
     "apps/*"
   ],
   "scripts": {
+    "stack:dev": "pnpm --filter stack-master-tool dev",
+    "stack:build": "pnpm --filter stack-master-tool build",
+    "stack:test": "pnpm --filter stack-master-tool test",
     "houselove:start": "pnpm --filter house-love start",
     "houselove:build": "pnpm --filter house-love build",
     "houselove:test": "pnpm --filter house-love test",

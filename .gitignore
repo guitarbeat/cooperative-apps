@@ -29,6 +29,8 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 serve.log
+server.log
+push_error.txt
 
 # Misc
 .DS_Store
@@ -41,3 +43,6 @@ serve.log
 
 # Keep .env.example in version control
 !.env.example
+
+# Local archives and export artifacts
+*.zip

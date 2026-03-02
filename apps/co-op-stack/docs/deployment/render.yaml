@@ -1,0 +1,24 @@
+services:
+  # Static site deployment (frontend only - backend moved to Supabase)
+  - type: web
+    name: stack-master-tool
+    env: static
+    buildCommand: npm install && npm run build:prod
+    staticPublishPath: ./.build/dist
+    headers:
+      - path: /*
+        name: X-Frame-Options
+        value: DENY
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
+      - path: /*
+        name: Referrer-Policy
+        value: strict-origin-when-cross-origin
+      - path: /*
+        name: Content-Security-Policy
+        value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; connect-src 'self' https://*.supabase.co wss://*.supabase.co; font-src 'self' https://fonts.gstatic.com;"
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

@@ -1,81 +1,58 @@
-# 🤝 Cooperative Apps
+# Cooperative Apps Monorepo
 
-A collection of open-source tools designed to empower and support **cooperative communities**, housing cooperatives, and intentional communities. This monorepo serves as a central hub for applications that facilitate communication, conflict resolution, and resource sharing.
+This repository contains multiple cooperative-community applications managed as a single monorepo.
 
----
+## Applications
 
-## 📱 Applications
+- `apps/houselove`: House Love platform
+- `apps/conflict-mediation-platform`: Conflict Mediation platform
+- `apps/voting`: Voting app
+- `apps/co-op-stack`: Stack Master meeting facilitation app
 
-| App | Description | Tech Stack |
-| :--- | :--- | :--- |
-| **[House Love](apps/houselove/)** | A platform for connecting cooperative communities with mediators, resources, and training materials. | React, SCSS, Leaflet |
-| **[Conflict Mediation](apps/conflict-mediation-platform/)** | A structured, 7-step interactive tool for guided interpersonal conflict resolution. | React, Vite, Tailwind, GSAP |
-
----
-
-## 🏗 Project Structure
-
-This repository uses **pnpm workspaces** to manage multiple applications efficiently.
+## Repository Layout
 
 ```text
 cooperative-apps/
-├── apps/
-│   ├── houselove/                    # House Love Platform
-│   └── conflict-mediation-platform/  # Conflict Mediation Tool
-├── package.json                      # Root scripts and workspace config
-├── pnpm-workspace.yaml               # Workspace definition
-└── CONTRIBUTING.md                   # Contribution guidelines
+  apps/
+    co-op-stack/
+    conflict-mediation-platform/
+    houselove/
+    voting/
+  package.json
+  pnpm-workspace.yaml
+  CONTRIBUTING.md
+  CODE_OF_CONDUCT.md
 ```
 
----
+## Prerequisites
 
-## 🚀 Getting Started
+- Node.js 18+ (Node.js 22 recommended)
+- pnpm 8+
 
-### Prerequisites
-
-- **Node.js 22.x** (Required for House Love compatibility)
-- **pnpm** (Recommended) or **npm**
-
-### Installation
-
-Install dependencies for all applications from the root directory:
+## Install
 
 ```bash
 pnpm install
 ```
 
-### Running the Apps
+## Run Apps
 
-You can run the apps individually from the root using these scripts:
-
-**House Love:**
-```bash
-pnpm houselove:start
-```
-
-**Conflict Mediation Platform:**
 ```bash
 pnpm conflict:dev
+pnpm houselove:start
+pnpm voting:dev
+pnpm stack:dev
 ```
 
----
+## Build and Test
 
-## 🛠 Development
+```bash
+pnpm build:all
+pnpm test:all
+```
 
-For detailed information on how to contribute, please see our **[Contributing Guide](CONTRIBUTING.md)**.
+## Notes
 
-### Key Scripts
-
-- `pnpm install`: Install all dependencies.
-- `pnpm houselove:build`: Build House Love for production.
-- `pnpm conflict:build`: Build Conflict Mediation Platform for production.
-
----
-
-## 📄 License
-
-This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) file for details.
-
----
-
-*Built with ❤️ for the cooperative movement.*
+- Workspace packages are defined in `pnpm-workspace.yaml`.
+- Root scripts are in `package.json`.
+- For contribution workflow, see `CONTRIBUTING.md`.
