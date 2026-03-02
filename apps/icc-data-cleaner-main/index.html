@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="ICC Data Cleaner - Automate the cleaning and transformation of PropertyBoss exports for QuickBooks Online"
+    />
+    <meta
+      name="keywords"
+      content="data cleaning, excel, quickbooks, property management, automation"
+    />
+    <meta name="author" content="ICC Data Cleaner" />
+    <meta property="og:title" content="ICC Data Cleaner" />
+    <meta
+      property="og:description"
+      content="Automate the cleaning and transformation of PropertyBoss exports for QuickBooks Online"
+    />
+    <meta property="og:type" content="website" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <script>
+      (function () {
+        const STORAGE_KEY = 'icc-data-cleaner-theme';
+        try {
+          const stored = localStorage.getItem(STORAGE_KEY);
+          const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+          const theme =
+            stored === 'light' || stored === 'dark'
+              ? stored
+              : mediaQuery.matches
+                ? 'dark'
+                : 'light';
+          if (theme === 'dark') {
+            document.documentElement.classList.add('dark');
+            document.documentElement.style.colorScheme = 'dark';
+          } else {
+            document.documentElement.classList.remove('dark');
+            document.documentElement.style.colorScheme = 'light';
+          }
+        } catch (error) {
+          console.error(
+            'Unable to set theme preference before hydration',
+            error,
+          );
+        }
+      })();
+    </script>
+    <title>ICC Data Cleaner</title>
+  </head>
+  <body class="antialiased">
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
