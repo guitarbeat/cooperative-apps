@@ -1,0 +1,12 @@
+{
+  "name": "@cooperative-apps/utils",
+  "version": "1.0.0",
+  "description": "Centralized utility functions for Cooperative Apps",
+  "main": "src/escapeHtml.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
