@@ -10,6 +10,9 @@ const io = new Server(server);
 // Serve static files from the public directory
 app.use(express.static(path.join(__dirname, '../public')));
 
+// Serve utility functions
+app.use('/js/escapeHtml.js', express.static(path.join(__dirname, '../../../packages/utils/src/escapeHtml.js')));
+
 let currentPoll = null;
 let votes = {};
 

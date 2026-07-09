@@ -104,6 +104,7 @@
   </div>
 
   <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/escapeHtml.js"></script>
   <script>
     const socket = io();
     let currentRole = null;
@@ -201,7 +202,7 @@
           const div = document.createElement('div');
           div.className = 'result-item';
           div.innerHTML = `
-            <div>${option.text}: ${voteCount} votes (${percentage}%)</div>
+            <div>${escapeHtml(option.text)}: ${voteCount} votes (${percentage}%)</div>
             <div class="bar" style="width: ${percentage > 0 ? percentage : 1}%">${percentage}%</div>
           `;
           resultsContainer.appendChild(div);
@@ -220,7 +221,7 @@
           poll.options.forEach(option => {
             const btn = document.createElement('button');
             btn.className = 'option-btn';
-            btn.innerText = option.text;
+            btn.innerText = option.text; // innerText is safe
             btn.onclick = () => submitVote(option.id);
             optionsContainer.appendChild(btn);
           });
