@@ -14,21 +14,40 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  validate:
+  build-lint-test:
+    name: Build, Lint, and Test ${{ matrix.app }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        app:
+          - co-op-stack
+          - conflict-mediation-platform
+          - houselove
+          - icc-data-cleaner-main
+          - voting
+
     steps:
       - uses: actions/checkout@v4
+
       - uses: pnpm/action-setup@v4
         with:
           version: 10
+
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: pnpm
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      - name: Test all packages
-        run: pnpm run test:all
-      - name: Build all packages
-        run: pnpm run build:all
+
+      - name: Lint
+        run: pnpm --filter ./apps/${{ matrix.app }} run lint --if-present
+
+      - name: Build
+        run: pnpm --filter ./apps/${{ matrix.app }} run build --if-present
+
+      - name: Test
+        run: pnpm --filter ./apps/${{ matrix.app }} run test --if-present
